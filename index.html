@@ -483,6 +483,7 @@ body::after{
 .pc-found{background:rgba(0,230,118,.07);border-color:rgba(0,230,118,.3);color:var(--green2)}
 .pc-gone{background:transparent;border-color:var(--line);color:var(--text3)}
 .pc-check{border-color:var(--line2);color:var(--text2);animation:chkPulse 1.2s infinite}
+.pc-manual{background:rgba(0,212,232,.05);border-color:rgba(0,212,232,.2);color:var(--cyan2)}
 @keyframes chkPulse{0%,100%{border-color:var(--line)}50%{border-color:var(--cyan)}}
 
 /* Sub section */
@@ -1221,10 +1222,19 @@ function _p(id,c,ic){
 async function jfetch(url, opts={}) {
   stats.apis++; refreshStats();
   try {
-    const r = await fetch(url, {...opts, signal: AbortSignal.timeout(10000)});
+    const r = await fetch(url, {
+      ...opts,
+      signal: AbortSignal.timeout(12000),
+      headers: { 'Accept': 'application/json', ...(opts.headers||{}) }
+    });
+    // 404 = not found, 429 = rate limited, 403 = forbidden
+    if (r.status === 404) return null;
+    if (r.status === 429) { feed('Rate limited — slow down','warn'); return null; }
     if (!r.ok) return null;
+    const ct = r.headers.get('content-type')||'';
+    if (!ct.includes('json')) return null;
     return await r.json();
-  } catch { return null; }
+  } catch(e) { return null; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1567,83 +1577,116 @@ async function runELA(file) {
    MODULE: USERNAME
 ═══════════════════════════════════════════ */
 async function doUsername(u) {
+  // Platforms: api = JSON API url, check = function to determine found from response
   const PLATS = [
-    {n:'GitHub',    api:`https://api.github.com/users/${u}`,url:`https://github.com/${u}`},
-    {n:'Reddit',    api:`https://www.reddit.com/user/${u}/about.json`,url:`https://reddit.com/u/${u}`},
-    {n:'HackerNews',api:`https://hacker-news.firebaseio.com/v0/user/${u}.json`,url:`https://news.ycombinator.com/user?id=${u}`},
-    {n:'Dev.to',    api:`https://dev.to/api/users/by_username?url=${u}`,url:`https://dev.to/${u}`},
-    {n:'Keybase',   api:`https://keybase.io/_/api/1.0/user/lookup.json?username=${u}`,url:`https://keybase.io/${u}`},
-    {n:'GitLab',    api:`https://gitlab.com/api/v4/users?username=${u}`,url:`https://gitlab.com/${u}`},
-    {n:'Docker Hub',api:`https://hub.docker.com/v2/users/${u}/`,url:`https://hub.docker.com/u/${u}`},
-    {n:'npm',       api:`https://registry.npmjs.org/-/v1/search?text=${u}&size=1`,url:`https://npmjs.com/~${u}`},
-    {n:'Twitter/X', api:null,url:`https://twitter.com/${u}`},
-    {n:'Instagram', api:null,url:`https://instagram.com/${u}`},
-    {n:'LinkedIn',  api:null,url:`https://linkedin.com/in/${u}`},
-    {n:'TikTok',    api:null,url:`https://tiktok.com/@${u}`},
-    {n:'Medium',    api:null,url:`https://medium.com/@${u}`},
-    {n:'YouTube',   api:null,url:`https://youtube.com/@${u}`},
-    {n:'Telegram',  api:null,url:`https://t.me/${u}`},
-    {n:'Pinterest', api:null,url:`https://pinterest.com/${u}`},
-    {n:'Snapchat',  api:null,url:`https://snapchat.com/add/${u}`},
-    {n:'Twitch',    api:null,url:`https://twitch.tv/${u}`},
+    {n:'GitHub',     api:`https://api.github.com/users/${u}`,
+      check: d => d && !d.message && !!d.login,
+      url:`https://github.com/${u}`},
+    {n:'Reddit',     api:`https://www.reddit.com/user/${u}/about.json`,
+      check: d => d && d.kind === 't2' && !!d.data?.name,
+      url:`https://reddit.com/u/${u}`},
+    {n:'HackerNews', api:`https://hacker-news.firebaseio.com/v0/user/${u}.json`,
+      check: d => d !== null && typeof d === 'object' && !!d.id,
+      url:`https://news.ycombinator.com/user?id=${u}`},
+    {n:'Dev.to',     api:`https://dev.to/api/users/by_username?url=${u}`,
+      check: d => d && !!d.username && !d.error,
+      url:`https://dev.to/${u}`},
+    {n:'Keybase',    api:`https://keybase.io/_/api/1.0/user/lookup.json?username=${u}`,
+      check: d => d && d.status?.code === 0 && d.them?.length > 0,
+      url:`https://keybase.io/${u}`},
+    {n:'GitLab',     api:`https://gitlab.com/api/v4/users?username=${u}`,
+      check: d => Array.isArray(d) && d.length > 0,
+      url:`https://gitlab.com/${u}`},
+    {n:'Docker Hub', api:`https://hub.docker.com/v2/users/${u}/`,
+      check: d => d && !!d.username && !d.message,
+      url:`https://hub.docker.com/u/${u}`},
+    {n:'npm',        api:`https://registry.npmjs.org/-/v1/search?text=maintainer:${u}&size=1`,
+      check: d => d && d.total > 0,
+      url:`https://npmjs.com/~${u}`},
+    {n:'PyPI',       api:`https://pypi.org/pypi/${u}/json`,
+      check: d => d && !!d.info,
+      url:`https://pypi.org/user/${u}`},
+    {n:'Twitter/X',  api:null, url:`https://twitter.com/${u}`},
+    {n:'Instagram',  api:null, url:`https://instagram.com/${u}`},
+    {n:'LinkedIn',   api:null, url:`https://linkedin.com/in/${u}`},
+    {n:'TikTok',     api:null, url:`https://tiktok.com/@${u}`},
+    {n:'Medium',     api:null, url:`https://medium.com/@${u}`},
+    {n:'YouTube',    api:null, url:`https://youtube.com/@${u}`},
+    {n:'Telegram',   api:null, url:`https://t.me/${u}`},
+    {n:'Pinterest',  api:null, url:`https://pinterest.com/${u}`},
+    {n:'Snapchat',   api:null, url:`https://snapchat.com/add/${u}`},
+    {n:'Twitch',     api:null, url:`https://twitch.tv/${u}`},
+    {n:'SoundCloud', api:null, url:`https://soundcloud.com/${u}`},
+    {n:'Pastebin',   api:null, url:`https://pastebin.com/u/${u}`},
   ];
 
   initSteps([
-    {id:'plat',lbl:'Platform enumeration'},
-    {id:'gh',  lbl:'GitHub deep analysis'},
-    {id:'rd',  lbl:'Reddit & HackerNews'},
-    {id:'dev', lbl:'Dev.to & Keybase'},
-    {id:'sum', lbl:'Summary'},
+    {id:'plat',lbl:'Platform enumeration (API-verified)'},
+    {id:'gh',  lbl:'GitHub deep profile analysis'},
+    {id:'rd',  lbl:'Reddit & HackerNews profiles'},
+    {id:'dev', lbl:'Dev.to, Keybase & npm'},
+    {id:'sum', lbl:'Intelligence summary'},
   ]);
 
   pRun('plat');
   const chips = PLATS.map(p =>
-    `<a href="${p.url}" target="_blank" class="pc pc-check" id="pc-${p.n.replace(/\W/g,'')}"
-      onclick="event.stopPropagation()"><span>⟳</span>${p.n}</a>`
+    `<a href="${p.url}" target="_blank" class="pc ${p.api?'pc-check':'pc-manual'}" id="pc-${p.n.replace(/\W/g,'')}"
+      onclick="event.stopPropagation()"><span>${p.api?'⟳':'→'}</span>${p.n}</a>`
   ).join('');
 
   mkCard('◉','PLATFORM ENUMERATION','b-info',u,
-    `<div class="notice">⚠ CORS limits browser checks. For full sweep: <strong>sherlock ${u}</strong> or
-      <a href="https://whatsmyname.app/?q=${u}" target="_blank">whatsmyname.app</a></div>
-    <div class="pg">${chips}</div>
-    <div class="sub"><div class="sub-hd">// Search Dorks</div>
+    `<div class="notice">⚡ API-verified platforms update live below. Manual links (→) open directly in browser.<br>
+      For full 300+ sweep: <a href="https://whatsmyname.app/?q=${u}" target="_blank">whatsmyname.app/?q=${u}</a></div>
+    <div class="pg" id="plat-grid-${u.replace(/\W/g,'')}">${chips}</div>
+    <div id="plat-summary-${u.replace(/\W/g,'')}" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3)">Checking APIs...</div>
+    <div class="sub"><div class="sub-hd">// One-Click Search Links</div>
       <div class="tags">
-        <a href="https://www.google.com/search?q=%22${u}%22+site:twitter.com+OR+site:linkedin.com+OR+site:instagram.com" target="_blank" class="tag tg">Google Multi-Platform</a>
-        <a href="https://whatsmyname.app/?q=${u}" target="_blank" class="tag">WhatsMyName</a>
-        <a href="https://www.google.com/search?q=intitle:%22${u}%22" target="_blank" class="tag">intitle dork</a>
-        <a href="https://yandex.com/search/?text=${u}" target="_blank" class="tag">Yandex</a>
+        <a href="https://whatsmyname.app/?q=${u}" target="_blank" class="tag tg">🔍 WhatsMyName (300+ sites)</a>
+        <a href="https://www.google.com/search?q=%22${u}%22+site:twitter.com+OR+site:instagram.com+OR+site:linkedin.com+OR+site:tiktok.com" target="_blank" class="tag tg">Google Social</a>
+        <a href="https://www.google.com/search?q=%22${u}%22" target="_blank" class="tag">Google Full</a>
+        <a href="https://yandex.com/search/?text=${encodeURIComponent(u)}" target="_blank" class="tag">Yandex</a>
+        <a href="https://www.bing.com/search?q=%22${u}%22" target="_blank" class="tag">Bing</a>
       </div>
     </div>
     <div class="sub"><div class="sub-hd">// CLI Commands</div>
       <div class="code">
-        <span class="cm"># 300+ platform sweep</span><br>
+        <span class="cm"># Best tool — 300+ platforms</span><br>
         <span class="cd">sherlock</span> ${u} --timeout 10 --print-found<br>
         <span class="cd">maigret</span> ${u} --all-sites<br>
+        <span class="cm"># Social Analyzer</span><br>
         <span class="cd">social-analyzer</span> --username "${u}" --analyze
       </div>
     </div>`
   );
 
+  // Check API platforms with proper detection
+  let foundCount = 0;
   for (const p of PLATS.filter(p=>p.api)) {
     const data = await jfetch(p.api);
     const el = document.getElementById('pc-'+p.n.replace(/\W/g,''));
     if (!el) continue;
-    const found = data && !data.message && (Array.isArray(data)?data.length>0:!!(data.id||data.username||data.login||data.data));
+    let found = false;
+    try { found = p.check(data); } catch(e) { found = false; }
     el.className = 'pc '+(found?'pc-found':'pc-gone');
     el.innerHTML = `<span>${found?'✓':'✗'}</span>${p.n}`;
-    if (found){stats.recs++;refreshStats();}
+    if (found){ stats.recs++; foundCount++; refreshStats(); }
   }
+  // Mark manual platforms
   PLATS.filter(p=>!p.api).forEach(p=>{
     const el=document.getElementById('pc-'+p.n.replace(/\W/g,''));
-    if(el){el.className='pc pc-gone';el.innerHTML=`<span>?</span>${p.n}`;}
+    if(el){ el.className='pc pc-manual'; el.innerHTML=`<span>→</span>${p.n}`; }
   });
+  // Update summary
+  const sumEl = document.getElementById(`plat-summary-${u.replace(/\W/g,'')}`);
+  if(sumEl) sumEl.innerHTML = `<span style="color:var(--green)">✓ ${foundCount} confirmed</span> via public APIs &nbsp;│&nbsp; ${PLATS.filter(p=>!p.api).length} manual links available`;
   pOk('plat');
 
   // GitHub
   pRun('gh');
   const gh = await jfetch(`https://api.github.com/users/${u}`);
-  const repos = gh&&!gh.message ? await jfetch(`https://api.github.com/users/${u}/repos?per_page=100&sort=updated`) : null;
-  if (gh && !gh.message) {
+  const repos = gh && !gh.message && gh.login
+    ? await jfetch(`https://api.github.com/users/${u}/repos?per_page=100&sort=updated`) : null;
+  if (gh && !gh.message && gh.login) {
     const langs={};(repos||[]).forEach(r=>{if(r.language)langs[r.language]=(langs[r.language]||0)+1;});
     const topL=Object.entries(langs).sort((a,b)=>b[1]-a[1]).slice(0,6);
     const topR=(repos||[]).slice(0,5);
@@ -1686,7 +1729,7 @@ async function doUsername(u) {
 
   pRun('rd');
   const rd = await jfetch(`https://www.reddit.com/user/${u}/about.json`);
-  if(rd?.data){
+  if(rd && rd.kind === 't2' && rd.data?.name){
     const d=rd.data;const created=new Date(d.created_utc*1000).toISOString().slice(0,10);
     const age=Math.floor((Date.now()-d.created_utc*1000)/(365.25*24*60*60*1000));
     stats.recs++;
@@ -1756,7 +1799,7 @@ async function doPhone(phone) {
   const country=COUNTRIES[cc]||`+${cc}`;
   pOk('parse');pRun('nv');
   let nv=null;
-  if(keys.nv) nv=await jfetch(`http://apilayer.net/api/validate?access_key=${keys.nv}&number=${encodeURIComponent(clean)}`);
+  if(keys.nv) nv=await jfetch(`https://apilayer.net/api/validate?access_key=${keys.nv}&number=${encodeURIComponent(clean)}&format=1`);
   pOk('nv');pRun('soc');
   stats.recs++;
   mkCard('◈','PHONE INTELLIGENCE','b-info',phone,
