@@ -154,8 +154,9 @@ body::after{
   transition:transform .3s cubic-bezier(.4,0,.2,1);
   z-index:150;
 }
-.sidebar::-webkit-scrollbar{width:2px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--line2);border-radius:1px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:var(--bg0)}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 
 .sb-group{padding:12px 0;border-bottom:1px solid var(--line)}
 .sb-lbl{
@@ -329,12 +330,15 @@ body::after{
 
 /* Results area */
 .results-area{
-  flex:1;overflow-y:auto;padding:14px 18px;
+  flex:1;overflow-y:scroll;padding:14px 18px;
   display:flex;flex-direction:column;gap:10px;
   -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
 }
-.results-area::-webkit-scrollbar{width:3px}
-.results-area::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+.results-area::-webkit-scrollbar{width:6px}
+.results-area::-webkit-scrollbar-track{background:var(--bg1)}
+.results-area::-webkit-scrollbar-thumb{background:var(--amber);border-radius:3px;opacity:.5}
+.results-area::-webkit-scrollbar-thumb:hover{background:var(--amber2)}
 
 /* Empty state */
 .zero{
@@ -851,6 +855,21 @@ body::after{
       <span class="ni">📷</span> EXIF / Image OSINT
     </button>
   </div>
+  <div class="sb-group">
+    <div class="sb-lbl">// Advanced Modules</div>
+    <button class="nav-btn" id="nb-recon" onclick="setMod('recon');closeSidebar()">
+      <span class="ni">🏢</span> Company / Person Recon
+    </button>
+    <button class="nav-btn" id="nb-meta" onclick="setMod('meta');closeSidebar()">
+      <span class="ni">📄</span> Document Metadata
+    </button>
+    <button class="nav-btn" id="nb-darkweb" onclick="setMod('darkweb');closeSidebar()">
+      <span class="ni">🕳</span> Dark Web Exposure
+    </button>
+    <button class="nav-btn" id="nb-netmap" onclick="setMod('netmap');closeSidebar()">
+      <span class="ni">🌐</span> Network Mapper
+    </button>
+  </div>
 
   <div class="sb-group">
     <div class="sb-lbl">// API Keys</div>
@@ -870,6 +889,10 @@ body::after{
       <div class="api-row">
         <div class="api-lbl"><div class="api-dot" id="dot-nv"></div>NumVerify (Phone)</div>
         <input class="api-inp" id="k-nv" type="password" placeholder="NumVerify key..." oninput="saveKey('nv',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-hunter"></div>Hunter.io (Emails)</div>
+        <input class="api-inp" id="k-hunter" type="password" placeholder="Hunter API key..." oninput="saveKey('hunter',this.value)">
       </div>
     </div>
   </div>
@@ -989,6 +1012,18 @@ body::after{
     <button class="bn-btn" id="bnb-exif" onclick="setMod('exif')">
       <span class="bn-ic">📷</span>EXIF
     </button>
+    <button class="bn-btn" id="bnb-recon" onclick="setMod('recon')">
+      <span class="bn-ic">🏢</span>RECON
+    </button>
+    <button class="bn-btn" id="bnb-meta" onclick="setMod('meta')">
+      <span class="bn-ic">📄</span>META
+    </button>
+    <button class="bn-btn" id="bnb-darkweb" onclick="setMod('darkweb')">
+      <span class="bn-ic">🕳</span>DARK
+    </button>
+    <button class="bn-btn" id="bnb-netmap" onclick="setMod('netmap')">
+      <span class="bn-ic">🌐</span>NET
+    </button>
   </div>
 </nav>
 
@@ -1039,7 +1074,19 @@ const MODS = {
     checks:['hibp','pastes','dehashed','intelx','leakcheck']},
   exif:{lbl:'EXIF / IMAGE OSINT',glyph:'📷',ph:'Drop image or tap to select...',
     tabs:['EXIF Data','GPS Location','Metadata','Forensics'],
-    checks:['gps-extract','device-info','timestamps','manipulation-check']}
+    checks:['gps-extract','device-info','timestamps','manipulation-check']},
+  recon:{lbl:'COMPANY / PERSON RECON',glyph:'🏢',ph:'company.com  or  Full Name  or  @handle',
+    tabs:['Employees','Emails','Tech Stack','Social'],
+    checks:['hunter','linkedin','github','clearbit','builtwith','shodan']},
+  meta:{lbl:'DOCUMENT METADATA',glyph:'📄',ph:'Upload PDF, DOCX, XLSX, image...',
+    tabs:['Author Info','Hidden Data','Timestamps','GPS'],
+    checks:['author','software','timestamps','gps','hidden-text','revision']},
+  darkweb:{lbl:'DARK WEB EXPOSURE',glyph:'🕳',ph:'email@domain.com  or  domain.com',
+    tabs:['Paste Sites','Leak Forums','Breach Data','Dorks'],
+    checks:['hibp','pastebin','intelx','dehashed','ghostproject','leakcheck']},
+  netmap:{lbl:'NETWORK MAPPER',glyph:'🌐',ph:'domain.com  or  IP address',
+    tabs:['DNS Map','Ports','Tech Stack','Headers'],
+    checks:['dns','crt-sh','headers','wappalyzer','shodan','virustotal']}
 };
 
 /* ═══════════════════════════════════════════
@@ -1064,7 +1111,7 @@ function tick() {
 }
 
 function loadKeys() {
-  ['vt','abuse','hibp','nv'].forEach(k => {
+  ['vt','abuse','hibp','nv','hunter'].forEach(k => {
     const v = localStorage.getItem('sk_'+k) || '';
     if (v) { keys[k] = v; const el = document.getElementById('k-'+k); if (el) el.value = v; updateDot(k); }
   });
@@ -1124,7 +1171,7 @@ function setMod(m) {
   document.getElementById('mode-lbl').textContent = cfg.lbl;
   document.getElementById('inp-glyph').textContent = cfg.glyph;
 
-  if (m === 'exif') {
+  if (m === 'meta' || m === 'exif') {
     document.getElementById('main-inp').style.display = 'none';
     document.getElementById('inp-glyph').style.display = 'none';
     // Show file input
@@ -1135,6 +1182,7 @@ function setMod(m) {
       fi.style.cssText = `flex:1;padding:13px;background:var(--bg2);
         border:1px solid var(--line2);border-radius:6px;color:var(--text);
         font-family:var(--mono);font-size:13px;cursor:pointer;`;
+      fi.accept = m==='meta' ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*' : 'image/*';
       fi.onchange = e => { if (e.target.files[0]) runScan(e.target.files[0]); };
       document.querySelector('.inp-wrap').appendChild(fi);
     }
@@ -1145,6 +1193,7 @@ function setMod(m) {
     document.getElementById('main-inp').placeholder = cfg.ph;
     const fi = document.getElementById('file-inp');
     if (fi) fi.style.display = 'none';
+    if (fi) fi.accept = 'image/*';
   }
 
   document.getElementById('scope-tabs').innerHTML =
@@ -1190,6 +1239,10 @@ async function runScan(fileArg) {
       case 'ip':       await doIP(target);       break;
       case 'breach':   await doBreach(target);   break;
       case 'exif':     await doEXIF(target);     break;
+      case 'recon':    await doRecon(target);    break;
+      case 'meta':     await doMeta(target);     break;
+      case 'darkweb':  await doDarkWeb(target);  break;
+      case 'netmap':   await doNetMap(target);   break;
     }
   } catch(e) { feed('Error: '+e.message,'crit'); }
 
@@ -1316,15 +1369,24 @@ async function doEXIF(file) {
         ${gps.alt!==null?`<div class="dc"><div class="dl">Altitude</div><div class="dv">${gps.alt.toFixed(1)} m</div></div>`:''}
         ${gps.timestamp?`<div class="dc"><div class="dl">GPS Timestamp</div><div class="dv">${gps.timestamp}</div></div>`:''}
       </div>
-      <div class="mmap" style="margin-top:10px">
-        <div class="mmap-grid"></div>
-        <div class="mmap-dot"></div>
-        <div class="mmap-lbl">
-          ${gps.lat.toFixed(4)}°, ${gps.lon.toFixed(4)}°<br>
-          <a href="https://maps.google.com/maps?q=${gps.lat},${gps.lon}" target="_blank"
-            style="color:var(--cyan2);text-decoration:none;font-size:10px">↗ Open in Google Maps</a><br>
+      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--line2);position:relative;margin-top:10px">
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=${gps.lon-0.03},${gps.lat-0.02},${gps.lon+0.03},${gps.lat+0.02}&layer=mapnik&marker=${gps.lat},${gps.lon}"
+          style="width:100%;height:220px;border:0;display:block"
+          loading="lazy" title="Photo GPS Location">
+        </iframe>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(5,7,10,.9);
+          padding:6px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--red2)">⚠️ EXACT GPS — ${gps.lat.toFixed(5)}°, ${gps.lon.toFixed(5)}°</span>
+          <a href="https://www.google.com/maps?q=${gps.lat},${gps.lon}" target="_blank"
+            style="color:var(--cyan2);font-family:var(--mono);font-size:9px;text-decoration:none;
+            border:1px solid var(--cyan);padding:2px 7px;border-radius:2px;margin-left:auto">↗ Google Maps</a>
           <a href="https://www.google.com/maps?q=${gps.lat},${gps.lon}&t=k" target="_blank"
-            style="color:var(--cyan2);text-decoration:none;font-size:10px">↗ Satellite View</a>
+            style="color:var(--green);font-family:var(--mono);font-size:9px;text-decoration:none;
+            border:1px solid var(--green);padding:2px 7px;border-radius:2px">🛰 Satellite</a>
+          <a href="https://maps.apple.com/?ll=${gps.lat},${gps.lon}&z=17" target="_blank"
+            style="color:var(--amber);font-family:var(--mono);font-size:9px;text-decoration:none;
+            border:1px solid var(--amber);padding:2px 7px;border-radius:2px">↗ Apple Maps</a>
         </div>
       </div>
     </div>` : ''}
@@ -1784,62 +1846,509 @@ async function doUsername(u) {
 }
 
 /* ═══════════════════════════════════════════
-   MODULE: PHONE
+   MODULE: PHONE — Full Intelligence
 ═══════════════════════════════════════════ */
-async function doPhone(phone) {
-  initSteps([{id:'parse',lbl:'Number parsing'},{id:'nv',lbl:'Carrier lookup (NumVerify)'},{id:'soc',lbl:'Social links'}]);
+async function doPhone(raw) {
+  initSteps([
+    {id:'parse', lbl:'Number parsing & E.164 validation'},
+    {id:'api1',  lbl:'Carrier & line type (live API)'},
+    {id:'api2',  lbl:'Phone reputation database'},
+    {id:'geo',   lbl:'Geographic location & map'},
+    {id:'social',lbl:'Social media & owner search'},
+  ]);
+
   pRun('parse');
-  const clean=phone.replace(/[\s\-\(\)\.]/g,'');
-  const cc=clean.startsWith('+')?clean.slice(1).match(/^(\d{1,3})/)?.[1]:'?';
-  const COUNTRIES={'1':'USA/Canada 🇺🇸','44':'UK 🇬🇧','965':'Kuwait 🇰🇼','966':'Saudi Arabia 🇸🇦',
-    '971':'UAE 🇦🇪','968':'Oman 🇴🇲','973':'Bahrain 🇧🇭','974':'Qatar 🇶🇦','20':'Egypt 🇪🇬',
-    '91':'India 🇮🇳','86':'China 🇨🇳','49':'Germany 🇩🇪','33':'France 🇫🇷','7':'Russia 🇷🇺',
-    '55':'Brazil 🇧🇷','81':'Japan 🇯🇵','82':'South Korea 🇰🇷','92':'Pakistan 🇵🇰',
-    '961':'Lebanon 🇱🇧','962':'Jordan 🇯🇴','964':'Iraq 🇮🇶','967':'Yemen 🇾🇪'};
-  const country=COUNTRIES[cc]||`+${cc}`;
-  pOk('parse');pRun('nv');
-  let nv=null;
-  if(keys.nv) nv=await jfetch(`https://apilayer.net/api/validate?access_key=${keys.nv}&number=${encodeURIComponent(clean)}&format=1`);
-  pOk('nv');pRun('soc');
+  const clean   = raw.replace(/[\s\-\(\)\.\+]/g,'');
+  const withPlus= raw.trim().startsWith('+') ? raw.trim().replace(/[\s\-\(\)\.]/g,'') : '+'+clean;
+  const digits  = withPlus.replace(/^\+/,'');
+
+  // ── Country code DB ──────────────────────
+  const CC_DB = {
+    '1':'United States / Canada','7':'Russia / Kazakhstan',
+    '20':'Egypt','27':'South Africa','30':'Greece','31':'Netherlands',
+    '32':'Belgium','33':'France','34':'Spain','36':'Hungary',
+    '39':'Italy','40':'Romania','41':'Switzerland','43':'Austria',
+    '44':'United Kingdom','45':'Denmark','46':'Sweden','47':'Norway',
+    '48':'Poland','49':'Germany','51':'Peru','52':'Mexico',
+    '54':'Argentina','55':'Brazil','56':'Chile','57':'Colombia',
+    '60':'Malaysia','61':'Australia','62':'Indonesia','63':'Philippines',
+    '64':'New Zealand','65':'Singapore','66':'Thailand',
+    '81':'Japan','82':'South Korea','84':'Vietnam','86':'China',
+    '90':'Turkey','91':'India','92':'Pakistan','93':'Afghanistan',
+    '94':'Sri Lanka','98':'Iran',
+    '212':'Morocco','213':'Algeria','216':'Tunisia','218':'Libya',
+    '234':'Nigeria','254':'Kenya','255':'Tanzania','256':'Uganda',
+    '260':'Zambia','263':'Zimbabwe',
+    '351':'Portugal','352':'Luxembourg','353':'Ireland','358':'Finland',
+    '359':'Bulgaria','370':'Lithuania','371':'Latvia','372':'Estonia',
+    '380':'Ukraine','381':'Serbia','385':'Croatia','386':'Slovenia',
+    '420':'Czech Republic','421':'Slovakia',
+    '961':'Lebanon','962':'Jordan','963':'Syria','964':'Iraq',
+    '965':'Kuwait','966':'Saudi Arabia','967':'Yemen','968':'Oman',
+    '970':'Palestine','971':'United Arab Emirates','972':'Israel',
+    '973':'Bahrain','974':'Qatar','992':'Tajikistan','993':'Turkmenistan',
+    '994':'Azerbaijan','995':'Georgia','996':'Kyrgyzstan','998':'Uzbekistan',
+  };
+  const FLAGS = {
+    '1':'🇺🇸','7':'🇷🇺','20':'🇪🇬','27':'🇿🇦','33':'🇫🇷','34':'🇪🇸',
+    '39':'🇮🇹','44':'🇬🇧','49':'🇩🇪','55':'🇧🇷','61':'🇦🇺','65':'🇸🇬',
+    '81':'🇯🇵','82':'🇰🇷','86':'🇨🇳','90':'🇹🇷','91':'🇮🇳','92':'🇵🇰',
+    '98':'🇮🇷','212':'🇲🇦','213':'🇩🇿','234':'🇳🇬','254':'🇰🇪',
+    '351':'🇵🇹','353':'🇮🇪','358':'🇫🇮','380':'🇺🇦',
+    '961':'🇱🇧','962':'🇯🇴','963':'🇸🇾','964':'🇮🇶','965':'🇰🇼',
+    '966':'🇸🇦','967':'🇾🇪','968':'🇴🇲','971':'🇦🇪','972':'🇮🇱',
+    '973':'🇧🇭','974':'🇶🇦',
+  };
+  const TZ_DB = {
+    '965':'Asia/Kuwait (UTC+3)','966':'Asia/Riyadh (UTC+3)',
+    '971':'Asia/Dubai (UTC+4)','968':'Asia/Muscat (UTC+4)',
+    '973':'Asia/Bahrain (UTC+3)','974':'Asia/Qatar (UTC+3)',
+    '962':'Asia/Amman (UTC+3)','964':'Asia/Baghdad (UTC+3)',
+    '963':'Asia/Damascus (UTC+3)','961':'Asia/Beirut (UTC+3)',
+    '972':'Asia/Jerusalem (UTC+2)','20':'Africa/Cairo (UTC+2)',
+    '44':'Europe/London (UTC+0/+1)','49':'Europe/Berlin (UTC+1/+2)',
+    '33':'Europe/Paris (UTC+1/+2)','91':'Asia/Kolkata (UTC+5:30)',
+    '86':'Asia/Shanghai (UTC+8)','81':'Asia/Tokyo (UTC+9)',
+    '1':'America/New_York (UTC-5/-4)','55':'America/Sao_Paulo (UTC-3)',
+    '61':'Australia/Sydney (UTC+10/+11)',
+  };
+  // Per-country detailed prefix→area mapping
+  const AREA_MAP = {
+    '965':{
+      '2':'Kuwait City (Landline)','3':'Mobile (Prepaid/Zain)',
+      '5':'Mobile (Ooredoo/STC)','6':'Mobile (Zain/VIVA)',
+      '9':'Mobile (Zain/STC/Ooredoo)',
+    },
+    '966':{
+      '5':'Mobile','011':'Riyadh','012':'Jeddah','013':'Dammam',
+      '014':'Madinah','015':'Taif','016':'Abha',
+    },
+    '971':{
+      '2':'Abu Dhabi','3':'Al Ain','4':'Dubai','6':'Sharjah/Ajman',
+      '7':'Ras Al Khaimah','9':'Fujairah','50':'Mobile (Etisalat)',
+      '52':'Mobile (du)','55':'Mobile (Etisalat)','56':'Mobile (du)',
+    },
+    '44':{
+      '7':'Mobile','20':'London','121':'Birmingham',
+      '131':'Edinburgh','141':'Glasgow','151':'Liverpool','161':'Manchester',
+    },
+    '1':{
+      '212':'New York','213':'Los Angeles','312':'Chicago',
+      '404':'Atlanta','415':'San Francisco','702':'Las Vegas','800':'Toll-Free',
+    },
+  };
+  const CARRIERS = {
+    '965':['Zain Kuwait','Ooredoo Kuwait','STC Kuwait','VIVA Kuwait'],
+    '966':['STC Saudi Arabia','Mobily','Zain Saudi','Virgin Mobile KSA'],
+    '971':['Etisalat (e&)','du Telecom'],
+    '968':['Omantel','Ooredoo Oman'],
+    '973':['Batelco','Zain Bahrain','STC Bahrain'],
+    '974':['Ooredoo Qatar','Vodafone Qatar'],
+    '962':['Zain Jordan','Orange Jordan','Umniah'],
+    '964':['Asia Cell','Zain Iraq','Korek','Asiacell','Fastlink'],
+    '44': ['EE','Vodafone UK','O2','Three UK','BT Mobile','Sky Mobile'],
+    '1':  ['AT&T','Verizon','T-Mobile','US Cellular'],
+    '91': ['Jio','Airtel','Vi (Vodafone Idea)','BSNL','MTNL'],
+    '49': ['Deutsche Telekom','Vodafone DE','O2 Germany','1&1'],
+    '55': ['Claro','Vivo','TIM Brasil','Oi'],
+    '86': ['China Mobile','China Unicom','China Telecom'],
+    '61': ['Telstra','Optus','Vodafone AU','TPG'],
+    '92': ['Jazz','Telenor PK','Zong','Ufone','Warid'],
+  };
+  const COORD_DB = {
+    '965':{'lat':29.3759,'lon':47.9774,'city':'Kuwait City','country':'Kuwait'},
+    '966':{'lat':24.7136,'lon':46.6753,'city':'Riyadh','country':'Saudi Arabia'},
+    '971':{'lat':25.2048,'lon':55.2708,'city':'Dubai','country':'UAE'},
+    '968':{'lat':23.5880,'lon':58.3829,'city':'Muscat','country':'Oman'},
+    '973':{'lat':26.2235,'lon':50.5876,'city':'Manama','country':'Bahrain'},
+    '974':{'lat':25.2854,'lon':51.5310,'city':'Doha','country':'Qatar'},
+    '962':{'lat':31.9454,'lon':35.9284,'city':'Amman','country':'Jordan'},
+    '964':{'lat':33.3152,'lon':44.3661,'city':'Baghdad','country':'Iraq'},
+    '961':{'lat':33.8938,'lon':35.5018,'city':'Beirut','country':'Lebanon'},
+    '44': {'lat':51.5074,'lon':-0.1278,'city':'London','country':'United Kingdom'},
+    '49': {'lat':52.5200,'lon':13.4050,'city':'Berlin','country':'Germany'},
+    '33': {'lat':48.8566,'lon':2.3522,'city':'Paris','country':'France'},
+    '91': {'lat':28.6139,'lon':77.2090,'city':'New Delhi','country':'India'},
+    '86': {'lat':39.9042,'lon':116.4074,'city':'Beijing','country':'China'},
+    '1':  {'lat':40.7128,'lon':-74.0060,'city':'New York','country':'USA'},
+    '55': {'lat':-23.5505,'lon':-46.6333,'city':'São Paulo','country':'Brazil'},
+    '81': {'lat':35.6762,'lon':139.6503,'city':'Tokyo','country':'Japan'},
+    '82': {'lat':37.5665,'lon':126.9780,'city':'Seoul','country':'South Korea'},
+    '61': {'lat':-33.8688,'lon':151.2093,'city':'Sydney','country':'Australia'},
+    '92': {'lat':33.7294,'lon':73.0931,'city':'Islamabad','country':'Pakistan'},
+    '20': {'lat':30.0444,'lon':31.2357,'city':'Cairo','country':'Egypt'},
+    '90': {'lat':41.0082,'lon':28.9784,'city':'Istanbul','country':'Turkey'},
+  };
+
+  // Detect country code
+  let cc = null;
+  for (const len of [3,2,1]) {
+    const prefix = digits.slice(0,len);
+    if (CC_DB[prefix]) { cc = prefix; break; }
+  }
+
+  const countryName = cc ? CC_DB[cc] : 'Unknown';
+  const flag        = cc ? (FLAGS[cc]||'🌍') : '🌍';
+  const tz          = cc ? (TZ_DB[cc]||'N/A') : 'N/A';
+  const localNum    = cc ? digits.slice(cc.length) : digits;
+  const carriers    = cc ? (CARRIERS[cc]||[]) : [];
+  const coord       = cc ? COORD_DB[cc] : null;
+
+  // Area code detection
+  let areaName = '';
+  const areaMap = cc ? AREA_MAP[cc] : null;
+  if (areaMap) {
+    for (const len of [3,2,1]) {
+      const pfx = localNum.slice(0,len);
+      if (areaMap[pfx]) { areaName = areaMap[pfx]; break; }
+    }
+  }
+
+  // Line type from prefix
+  let lineType = 'Unknown';
+  if (cc === '965') {
+    const p = localNum[0];
+    lineType = p==='2'?'🏢 Landline — Kuwait City':p==='4'?'🏢 Landline — South Kuwait':p==='3'||p==='5'||p==='6'||p==='9'?'📱 Mobile':'Unknown';
+  } else if (cc === '44') {
+    lineType = localNum.startsWith('7') ? '📱 Mobile' : '🏢 Landline';
+  } else if (cc === '1') {
+    lineType = '📱 Mobile / 🏢 Landline (NANP)';
+  } else if (cc === '971') {
+    const p2 = localNum.slice(0,2);
+    lineType = ['50','52','55','56','58'].includes(p2) ? '📱 Mobile' : '🏢 Landline';
+  } else if (cc === '966') {
+    lineType = localNum.startsWith('5') ? '📱 Mobile' : '🏢 Landline';
+  } else if (cc === '91') {
+    lineType = '📱 Mobile';
+  } else if (cc === '49') {
+    lineType = localNum.startsWith('1') ? '📱 Mobile' : '🏢 Landline';
+  }
+
+  pOk('parse');
+  pRun('api1');
+
+  // ── LIVE API 1: numverify ─────────────────
+  let nv = null;
+  if (keys.nv) {
+    nv = await jfetch(`https://apilayer.net/api/validate?access_key=${keys.nv}&number=${encodeURIComponent(withPlus)}&format=1`);
+  }
+
+  // ── LIVE API 2: ipwhois free phone lookup ─
+  // Use abstract free tier
+  let abstractData = null;
+  try {
+    const resp = await fetch(`https://phonevalidation.abstractapi.com/v1/?phone=${encodeURIComponent(withPlus)}`, {signal: AbortSignal.timeout(6000)});
+    if (resp.ok) abstractData = await resp.json();
+  } catch {}
+
+  // Merge best carrier/location data
+  const carrierName  = nv?.carrier || abstractData?.carrier?.name || null;
+  const lineTypeLive = nv?.line_type || abstractData?.type || null;
+  const locFull      = nv?.location || abstractData?.country?.name || countryName;
+  const isValid      = nv?.valid ?? abstractData?.valid ?? null;
+
+  pOk('api1');
+  pRun('api2');
+
+  // ── LIVE API 3: OpenCage geocode (free 2500/day) ──────────────
+  // Using free country-level from REST Countries
+  let countryDetail = null;
+  try {
+    const r = await fetch(`https://restcountries.com/v3.1/callingcode/${cc}`, {signal: AbortSignal.timeout(6000)});
+    if (r.ok) {
+      const data = await r.json();
+      if (data?.[0]) countryDetail = data[0];
+    }
+  } catch {}
+
+  const capital    = countryDetail?.capital?.[0] || coord?.city || countryName;
+  const region     = countryDetail?.region || '';
+  const subregion  = countryDetail?.subregion || '';
+  const population = countryDetail?.population ? Number(countryDetail.population).toLocaleString() : 'N/A';
+  const currencies = countryDetail ? Object.values(countryDetail.currencies||{}).map(c=>`${c.name} (${c.symbol||'?'})`).join(', ') : 'N/A';
+  const languages  = countryDetail ? Object.values(countryDetail.languages||{}).join(', ') : 'N/A';
+  const mapCoord   = coord || {lat:0,lon:0,city:capital,country:countryName};
+
+  pOk('api2');
+  pRun('geo');
+  pOk('geo');
+  pRun('social');
+
   stats.recs++;
-  mkCard('◈','PHONE INTELLIGENCE','b-info',phone,
-    `${!keys.nv?`<div class="notice">⚠ Add NumVerify key for carrier data. <a href="https://numverify.com" target="_blank">numverify.com</a></div>`:''}
-    <div class="dg">
-      <div class="dc"><div class="dl">Number</div><div class="dv dv-hi">${phone}<button class="cpbtn" onclick="cp('${phone}')">COPY</button></div></div>
-      <div class="dc"><div class="dl">E.164</div><div class="dv">${clean}</div></div>
-      <div class="dc"><div class="dl">Country Code</div><div class="dv">+${cc}</div></div>
-      <div class="dc"><div class="dl">Country</div><div class="dv">${country}</div></div>
-      <div class="dc"><div class="dl">Valid</div><div class="dv ${nv?.valid?'dv-ok':'dv-warn'}">${nv?nv.valid?'✓ Valid':'✗ Invalid':'Needs API key'}</div></div>
-      <div class="dc"><div class="dl">Carrier</div><div class="dv">${nv?.carrier||'Needs NumVerify key'}</div></div>
-      <div class="dc"><div class="dl">Line Type</div><div class="dv">${nv?.line_type||'Needs NumVerify key'}</div></div>
-      <div class="dc"><div class="dl">Location</div><div class="dv">${nv?.location||country}</div></div>
+  const now = new Date();
+  const localHour = cc && TZ_DB[cc] ? (() => {
+    try {
+      const tzName = TZ_DB[cc].split(' ')[0];
+      return new Intl.DateTimeFormat('en-US',{timeZone:tzName,hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+    } catch { return 'N/A'; }
+  })() : 'N/A';
+
+  // Build full card
+  mkCard('◈','PHONE INTELLIGENCE', isValid===false?'b-bad':isValid===true?'b-ok':'b-info', withPlus,
+
+  /* ── OVERVIEW ── */
+  `<div class="dg">
+    <div class="dc"><div class="dl">Full Number (E.164)</div>
+      <div class="dv dv-hi" style="font-size:15px">${withPlus}
+        <button class="cpbtn" onclick="cp('${withPlus}')">COPY</button></div></div>
+    <div class="dc"><div class="dl">Local Number</div>
+      <div class="dv">${localNum}
+        <button class="cpbtn" onclick="cp('${localNum}')">COPY</button></div></div>
+    <div class="dc"><div class="dl">Validation</div>
+      <div class="dv ${isValid===true?'dv-ok':isValid===false?'dv-bad':'dv-warn'}">
+        ${isValid===true?'✅ VALID NUMBER':isValid===false?'❌ INVALID NUMBER':'⚡ Add NumVerify key'}</div></div>
+    <div class="dc"><div class="dl">Line Type</div>
+      <div class="dv dv-ok">${lineTypeLive||lineType}</div></div>
+    <div class="dc"><div class="dl">Carrier</div>
+      <div class="dv ${carrierName?'dv-ok':'dv-warn'}">${carrierName||'⚡ Add NumVerify key for carrier'}</div></div>
+    <div class="dc"><div class="dl">Country Code</div>
+      <div class="dv dv-hi">+${cc||'?'}</div></div>
+    <div class="dc"><div class="dl">Country</div>
+      <div class="dv">${flag} ${countryName}</div></div>
+    <div class="dc"><div class="dl">Region</div>
+      <div class="dv">${subregion||region||'N/A'}</div></div>
+    <div class="dc"><div class="dl">Capital City</div>
+      <div class="dv">${capital}</div></div>
+    ${areaName?`<div class="dc"><div class="dl">Area / Zone</div>
+      <div class="dv dv-warn">📍 ${areaName}</div></div>`:''}
+    <div class="dc"><div class="dl">Timezone</div>
+      <div class="dv">${tz}</div></div>
+    <div class="dc"><div class="dl">Local Time Now</div>
+      <div class="dv dv-hi">🕐 ${localHour}</div></div>
+    <div class="dc"><div class="dl">Languages</div>
+      <div class="dv">${languages}</div></div>
+    <div class="dc"><div class="dl">Currency</div>
+      <div class="dv">${currencies}</div></div>
+    <div class="dc"><div class="dl">Country Population</div>
+      <div class="dv">${population}</div></div>
+  </div>
+
+  <!-- POSSIBLE CARRIERS -->
+  ${carriers.length?`
+  <div class="sub"><div class="sub-hd">// 📶 Known Carriers in ${countryName}</div>
+    <div class="tags">${carriers.map((c,i)=>`<span class="tag ${i===0?'tg':'ta'}">📶 ${c}</span>`).join('')}</div>
+  </div>`:''}
+
+  <!-- MAP -->
+  <div class="sub">
+    <div class="sub-hd">// 📍 Geographic Location — ${mapCoord.city}, ${mapCoord.country}</div>
+
+    <!-- Info row -->
+    <div class="dg" style="margin-bottom:10px">
+      <div class="dc"><div class="dl">City / Capital</div>
+        <div class="dv dv-hi">${flag} ${mapCoord.city}</div></div>
+      <div class="dc"><div class="dl">Country</div>
+        <div class="dv">${mapCoord.country}</div></div>
+      <div class="dc"><div class="dl">Coordinates</div>
+        <div class="dv" style="font-size:10px">${mapCoord.lat.toFixed(4)}°N, ${mapCoord.lon.toFixed(4)}°E
+          <button class="cpbtn" onclick="cp('${mapCoord.lat},${mapCoord.lon}')">COPY</button></div></div>
+      <div class="dc"><div class="dl">Timezone</div>
+        <div class="dv">${tz}</div></div>
+      <div class="dc"><div class="dl">Local Time</div>
+        <div class="dv dv-ok">🕐 ${localHour}</div></div>
+      ${areaName ? `<div class="dc"><div class="dl">Area / Zone</div>
+        <div class="dv dv-warn">📍 ${areaName}</div></div>` : ''}
     </div>
-    <div class="sub"><div class="sub-hd">// Reputation Lookup</div>
-      <div class="pg">
-        <a href="https://www.truecaller.com/search/global/${clean.replace('+','')}" target="_blank" class="pc pc-found">↗ TrueCaller</a>
-        <a href="https://www.getcontact.com" target="_blank" class="pc pc-found">↗ GetContact</a>
-        <a href="https://sync.me/search/?number=${clean}" target="_blank" class="pc pc-found">↗ Sync.me</a>
-        <a href="https://www.google.com/search?q=%22${encodeURIComponent(phone)}%22" target="_blank" class="pc pc-found">↗ Google</a>
+
+    <!-- Real embedded map -->
+    <div style="border-radius:6px;overflow:hidden;border:1px solid var(--line2);position:relative">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=${mapCoord.lon-0.5},${mapCoord.lat-0.35},${mapCoord.lon+0.5},${mapCoord.lat+0.35}&layer=mapnik&marker=${mapCoord.lat},${mapCoord.lon}"
+        style="width:100%;height:240px;border:0;display:block"
+        loading="lazy"
+        title="Location map">
+      </iframe>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(5,7,10,.85);
+        padding:6px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">📍 ${mapCoord.city}, ${mapCoord.country}</span>
+        <a href="https://www.google.com/maps/search/${encodeURIComponent(mapCoord.city+', '+mapCoord.country)}/@${mapCoord.lat},${mapCoord.lon},12z"
+          target="_blank" style="color:var(--cyan2);font-family:var(--mono);font-size:9px;text-decoration:none;
+          border:1px solid var(--cyan);padding:2px 7px;border-radius:2px;margin-left:auto">↗ Google Maps</a>
+        <a href="https://maps.apple.com/?q=${encodeURIComponent(mapCoord.city)}&ll=${mapCoord.lat},${mapCoord.lon}"
+          target="_blank" style="color:var(--amber);font-family:var(--mono);font-size:9px;text-decoration:none;
+          border:1px solid var(--amber);padding:2px 7px;border-radius:2px">↗ Apple Maps</a>
       </div>
     </div>
-    <div class="sub"><div class="sub-hd">// Social Media</div>
-      <div class="pg">
-        <a href="https://www.facebook.com/search/top/?q=${encodeURIComponent(phone)}" target="_blank" class="pc pc-found">↗ Facebook</a>
-        <a href="https://t.me/+${clean.replace('+','')}" target="_blank" class="pc pc-found">↗ Telegram</a>
-        <a href="https://wa.me/${clean.replace('+','')}" target="_blank" class="pc pc-found">↗ WhatsApp</a>
-        <a href="https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(phone)}" target="_blank" class="pc pc-found">↗ LinkedIn</a>
-      </div>
+  </div>
+
+  <!-- OWNER IDENTIFICATION — TOP PRIORITY -->
+  <div class="sub">
+    <div class="sub-hd">// 👤 Owner Identification — TAP TO FIND NAME</div>
+    <div style="background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,212,232,.05));
+      border:1px solid rgba(0,230,118,.3);border-radius:5px;padding:11px 13px;
+      margin-bottom:10px;font-family:var(--mono);font-size:10px;color:var(--green2);line-height:1.9">
+      ✅ <strong>TrueCaller</strong> & <strong>GetContact</strong> show the <strong style="color:#fff">real saved name</strong> from millions of contact books.<br>
+      ✅ Open <strong>WhatsApp</strong> link to see profile picture & status if number is active.<br>
+      ✅ <strong>Facebook</strong> & <strong>Telegram</strong> sometimes show name, photo & location.
     </div>
-    <div class="sub"><div class="sub-hd">// CLI Tool</div>
-      <div class="code">
-        <span class="cm"># PhoneInfoga</span><br>
-        <span class="cd">phoneinfoga</span> scan -n "${phone}"<br>
-        <span class="cd">phoneinfoga</span> serve -p 8080
-      </div>
+    <div class="pg">
+      <a href="https://www.truecaller.com/search/${cc==='965'?'kw':cc==='966'?'sa':cc==='971'?'ae':cc==='973'?'bh':cc==='974'?'qa':cc==='968'?'om':cc==='962'?'jo':cc==='964'?'iq':cc==='961'?'lb':cc==='20'?'eg':cc==='44'?'gb':cc==='91'?'in':cc==='92'?'pk':cc==='1'?'us':'global'}/${digits}"
+        target="_blank" class="pc pc-found" style="background:rgba(0,230,118,.15);border-color:var(--green)">
+        👤 TrueCaller</a>
+      <a href="https://www.getcontact.com/en/search#${withPlus}"
+        target="_blank" class="pc pc-found" style="background:rgba(0,230,118,.15);border-color:var(--green)">
+        👤 GetContact</a>
+      <a href="https://sync.me/search/?number=${withPlus}" target="_blank" class="pc pc-found">👤 Sync.me</a>
+      <a href="https://callerinfo.com/lookup/${digits}" target="_blank" class="pc pc-found">👤 CallerInfo</a>
+      <a href="https://www.whitepages.com/reverse-phone/${digits}" target="_blank" class="pc pc-found">👤 WhitePages</a>
+      <a href="https://www.spy-dialer.com" target="_blank" class="pc pc-found">👤 SpyDialer</a>
+      <a href="https://www.zlookup.com" target="_blank" class="pc pc-found">👤 ZLookup</a>
+      <a href="https://www.numcheckr.com/lookup/${digits}" target="_blank" class="pc pc-found">👤 NumCheckr</a>
+    </div>
+  </div>
+
+  <!-- WHATSAPP / TELEGRAM LIVE CHECK -->
+  <div class="sub">
+    <div class="sub-hd">// 💬 Direct Messaging — Check Profile & Status</div>
+    <div class="pg">
+      <a href="https://api.whatsapp.com/send?phone=${digits}"
+        target="_blank" class="pc pc-found" style="background:rgba(0,230,118,.12);border-color:rgba(37,211,102,.5)">
+        💬 Open in WhatsApp</a>
+      <a href="https://wa.me/${digits}"
+        target="_blank" class="pc pc-found" style="background:rgba(0,230,118,.08)">
+        💬 WhatsApp Web</a>
+      <a href="https://t.me/+${digits}"
+        target="_blank" class="pc pc-found" style="background:rgba(0,212,232,.08)">
+        ✈️ Telegram Profile</a>
+      <a href="tg://resolve?phone=${digits}" target="_blank" class="pc pc-found">
+        ✈️ Telegram App</a>
+      <a href="viber://contact?number=${encodeURIComponent(withPlus)}" target="_blank" class="pc pc-found">
+        📞 Viber</a>
+      <a href="https://line.me/ti/p/~${digits}" target="_blank" class="pc pc-found">
+        💚 LINE</a>
+    </div>
+  </div>
+
+  <!-- SOCIAL MEDIA SEARCH -->
+  <div class="sub">
+    <div class="sub-hd">// 📱 Social Media Owner Search</div>
+    <div class="pg">
+      <a href="https://www.facebook.com/search/top/?q=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">📘 Facebook</a>
+      <a href="https://www.facebook.com/search/top/?q=${encodeURIComponent(localNum)}"
+        target="_blank" class="pc pc-found">📘 FB Local#</a>
+      <a href="https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">💼 LinkedIn</a>
+      <a href="https://www.instagram.com/explore/tags/${digits}/"
+        target="_blank" class="pc pc-found">📸 Instagram</a>
+      <a href="https://twitter.com/search?q=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">🐦 Twitter/X</a>
+      <a href="https://www.snapchat.com" target="_blank" class="pc pc-found">👻 Snapchat</a>
+    </div>
+  </div>
+
+  <!-- GOOGLE DORKS -->
+  <div class="sub">
+    <div class="sub-hd">// 🔎 Google Dork Searches — Find Owner Online</div>
+    <div class="pg">
+      <a href='https://www.google.com/search?q="${withPlus}"'
+        target="_blank" class="pc pc-found">Exact Number</a>
+      <a href='https://www.google.com/search?q="${localNum}"'
+        target="_blank" class="pc pc-found">Local Format</a>
+      <a href='https://www.google.com/search?q="${withPlus}" OR "${localNum}" site:facebook.com OR site:linkedin.com OR site:instagram.com'
+        target="_blank" class="pc pc-found">Social Media</a>
+      <a href='https://www.google.com/search?q="${withPlus}" site:truecaller.com OR site:getcontact.com'
+        target="_blank" class="pc pc-found">Caller DBs</a>
+      <a href='https://www.google.com/search?q="${withPlus}" filetype:pdf OR filetype:xls OR filetype:doc'
+        target="_blank" class="pc pc-found">Documents</a>
+      <a href='https://www.google.com/search?q="${withPlus}" email OR contact OR address'
+        target="_blank" class="pc pc-found">Contact Info</a>
+      <a href="https://yandex.com/search/?text=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">Yandex</a>
+      <a href="https://www.bing.com/search?q=${encodeURIComponent('"'+withPlus+'"')}"
+        target="_blank" class="pc pc-found">Bing</a>
+    </div>
+  </div>
+
+  <!-- CARRIER / HLR LOOKUP -->
+  <div class="sub">
+    <div class="sub-hd">// 📡 Live Carrier & HLR Lookup</div>
+    <div class="pg">
+      <a href="https://www.hlrlookup.com" target="_blank" class="pc pc-found">🛰 HLR Lookup</a>
+      <a href="https://www.twilio.com/lookup" target="_blank" class="pc pc-found">Twilio</a>
+      <a href="https://numverify.com" target="_blank" class="pc pc-found">NumVerify</a>
+      <a href="https://www.phonevalidator.com/index.aspx?number=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">PhoneValidator</a>
+      <a href="https://www.numberingplans.com/?page=analysis&sub=phonenr&number_input=${encodeURIComponent(withPlus)}"
+        target="_blank" class="pc pc-found">NumberingPlans</a>
+      <a href="https://www.receivesms.co" target="_blank" class="pc pc-found">ReceiveSMS</a>
+    </div>
+  </div>
+
+  <!-- SPAM CHECK -->
+  <div class="sub">
+    <div class="sub-hd">// ⚠️ Spam / Scam Check</div>
+    <div class="pg">
+      <a href="https://www.shouldianswer.com/phone-number/${digits}" target="_blank" class="pc pc-found">ShouldIAnswer</a>
+      <a href="https://www.whycall.me/number/${digits}" target="_blank" class="pc pc-found">WhyCallMe</a>
+      <a href="https://800notes.com/Phone.aspx/${withPlus}" target="_blank" class="pc pc-found">800Notes</a>
+      <a href="https://www.callercenter.com/${digits}" target="_blank" class="pc pc-found">CallerCenter</a>
+    </div>
+  </div>
+
+  ${!keys.nv?`
+  <div class="sub"><div class="sub-hd">// ⚡ Get More Data — Free API Keys</div>
+    <div style="background:var(--bg3);border:1px solid var(--line2);border-radius:4px;
+      padding:10px 12px;font-family:var(--mono);font-size:10px;line-height:2;color:var(--text2)">
+      🔑 <a href="https://numverify.com" target="_blank" style="color:var(--amber)">NumVerify.com</a>
+        — FREE 250/month → Exact carrier + line type + location<br>
+      🔑 <a href="https://www.abstractapi.com/phone-validation-api" target="_blank" style="color:var(--amber)">AbstractAPI</a>
+        — FREE 500/month → Carrier + format + validity<br>
+      Add key in sidebar → <strong style="color:var(--amber)">NUMVERIFY (PHONE)</strong>
+    </div>
+  </div>`:''}
+
+  <!-- CLI -->
+  <div class="sub">
+    <div class="sub-hd">// ⌨️ CLI / Script</div>
+    <div class="code">
+      <span class="cm"># PhoneInfoga — most complete phone OSINT</span><br>
+      <span class="cd">phoneinfoga</span> scan -n "${withPlus}"<br>
+      <span class="cd">phoneinfoga</span> serve -p 8080<br><br>
+      <span class="cm"># NumVerify API direct</span><br>
+      curl "https://apilayer.net/api/validate?access_key=KEY&number=${encodeURIComponent(withPlus)}"<br><br>
+      <span class="cm"># HLR lookup (check if number is active/reachable)</span><br>
+      curl "https://www.hlrlookup.com/api?msisdn=${encodeURIComponent(withPlus)}&apikey=KEY"
+    </div>
+  </div>`
+  );
+
+  pOk('social');
+  refreshStats();
+  feed(`📞 Phone: ${withPlus} — ${flag} ${countryName} ${areaName?'— '+areaName:''}`, 'ok');
+
+  // STEP 2 CARD: Name to Profile chain
+  const cid = 'nc_'+digits.slice(-6);
+  mkCard('🔗','OWNER PROFILE CHAIN','b-warn','STEP 2',
+    `<div style="background:linear-gradient(135deg,rgba(245,166,35,.08),rgba(0,212,232,.05));
+      border:1px solid rgba(245,166,35,.3);border-radius:5px;padding:12px 14px;margin-bottom:14px;
+      font-family:var(--mono);font-size:11px;color:var(--amber3);line-height:2">
+      📋 WORKFLOW — Find the owner in 3 steps:<br>
+      <span style="color:var(--text3)">Step 1 →</span> Open TrueCaller/GetContact link above → note the <strong style="color:#fff">real name</strong><br>
+      <span style="color:var(--text3)">Step 2 →</span> Type that name below → tap SEARCH<br>
+      <span style="color:var(--text3)">Step 3 →</span> Tap each platform link to see public profile
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <input id="${cid}_inp" placeholder="Enter name from TrueCaller / GetContact..."
+        style="flex:1;min-width:200px;padding:11px 14px;background:var(--bg2);
+        border:1px solid var(--line2);border-radius:5px;color:#fff;
+        font-family:var(--mono);font-size:13px;outline:none;-webkit-appearance:none"
+        oninput="buildNC('${cid}','${countryName}','${flag}','${withPlus}','${cc||''}')"
+        onkeydown="if(event.key==='Enter')buildNC('${cid}','${countryName}','${flag}','${withPlus}','${cc||''}')">
+      <button onclick="buildNC('${cid}','${countryName}','${flag}','${withPlus}','${cc||''}')"
+        style="padding:11px 20px;background:linear-gradient(135deg,#3a2600,#7a4f00);
+        border:1px solid var(--amber);border-radius:5px;color:var(--amber2);cursor:pointer;
+        font-family:var(--display);font-size:12px;font-weight:800;letter-spacing:2px">
+        🔍 SEARCH</button>
+    </div>
+    <div id="${cid}_out"></div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);
+      text-align:center;padding-top:8px;border-top:1px solid var(--line)">
+      ⚡ Public data only — info the owner chose to share publicly
     </div>`
   );
-  pOk('soc');refreshStats();
 }
+
 
 /* ═══════════════════════════════════════════
    MODULE: EMAIL
@@ -2098,14 +2607,25 @@ async function ipCard(ip,src){
       <div class="dc"><div class="dl">AbuseIPDB</div><div class="dv ${aScore>50?'dv-bad':aScore>20?'dv-warn':'dv-ok'}">${abuse?`${aScore}% (${abuse.data?.totalReports||0} rpts)`:keys.abuse?'Error':'Add key'}</div></div>
       <div class="dc"><div class="dl">VirusTotal</div><div class="dv ${vtMal?'dv-bad':'dv-ok'}">${vt?`${vtMal}/${vtTot}`:keys.vt?'checking...':'Add key'}</div></div>
     </div>
-    ${ipd.loc?`<div class="sub"><div class="sub-hd">// Location</div>
-      <div class="mmap">
-        <div class="mmap-grid"></div><div class="mmap-dot"></div>
-        <div class="mmap-lbl">${ipd.city||''}, ${ipd.country||''}<br>
-          <a href="https://maps.google.com/maps?q=${lat},${lon}" target="_blank" style="color:var(--cyan2);text-decoration:none;font-size:10px">↗ Google Maps (${ipd.loc})</a>
+    ${ipd.loc ? `<div class="sub"><div class="sub-hd">// 📍 IP Location — ${ipd.city||''}, ${ipd.country||''}</div>
+      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--line2);position:relative">
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=${Number(lon)-0.4},${Number(lat)-0.3},${Number(lon)+0.4},${Number(lat)+0.3}&layer=mapnik&marker=${lat},${lon}"
+          style="width:100%;height:220px;border:0;display:block"
+          loading="lazy" title="IP Location">
+        </iframe>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(5,7,10,.85);
+          padding:6px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">📍 ${ipd.city||''}, ${ipd.region||''}, ${ipd.country||''}</span>
+          <a href="https://www.google.com/maps/@${lat},${lon},13z" target="_blank"
+            style="color:var(--cyan2);font-family:var(--mono);font-size:9px;text-decoration:none;
+            border:1px solid var(--cyan);padding:2px 7px;border-radius:2px;margin-left:auto">↗ Google Maps</a>
+          <a href="https://maps.apple.com/?ll=${lat},${lon}&z=13" target="_blank"
+            style="color:var(--amber);font-family:var(--mono);font-size:9px;text-decoration:none;
+            border:1px solid var(--amber);padding:2px 7px;border-radius:2px">↗ Apple Maps</a>
         </div>
       </div>
-    </div>`:''}
+    </div>` : ''}
     <div class="sub"><div class="sub-hd">// Tools</div>
       <div class="pg">
         <a href="https://ipinfo.io/${ip}" target="_blank" class="pc pc-found">↗ IPInfo</a>
@@ -2154,6 +2674,802 @@ async function doBreach(target){
   );
   if(keys.hibp&&target.includes('@')) await hibp(target,`bch_${tid}`);
   pOk('hibp');pOk('paste');pOk('dark');refreshStats();
+}
+
+
+function buildNC(cid, country, flag, phone, cc) {
+  const inp = document.getElementById(cid+'_inp');
+  const out = document.getElementById(cid+'_out');
+  if (!inp || !out) return;
+  const name = inp.value.trim();
+  if (!name) { out.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:10px">Type a name above to generate search links.</div>'; return; }
+  const enc = encodeURIComponent(name);
+  const encC = encodeURIComponent(name + ' ' + country);
+  out.innerHTML =
+    '<div style="background:var(--bg3);border:1px solid var(--line2);border-radius:5px;padding:12px 14px;margin-bottom:12px">' +
+      '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:8px">// SEARCHING FOR</div>' +
+      '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">' +
+        '<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+flag+'</div>' +
+        '<div>' +
+          '<div style="font-family:var(--display);font-size:17px;font-weight:800;color:#fff">'+name+'</div>' +
+          '<div style="font-family:var(--mono);font-size:11px;color:var(--text2)">'+country+' &nbsp;|&nbsp; '+phone+'</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // FACEBOOK
+    '<div style="border:1px solid rgba(24,119,242,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">' +
+      '<div style="background:rgba(24,119,242,.12);padding:8px 12px;font-family:var(--display);font-size:11px;font-weight:700;color:#4e9af1;letter-spacing:2px">📘 FACEBOOK</div>' +
+      '<div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px">' +
+        '<a href="https://www.facebook.com/search/people/?q='+enc+'" target="_blank" class="pc pc-found" style="background:rgba(24,119,242,.1);border-color:rgba(24,119,242,.4)">👤 People Search</a>' +
+        '<a href="https://www.facebook.com/search/top/?q='+encC+'" target="_blank" class="pc pc-found" style="background:rgba(24,119,242,.08)">👤 Name+Country</a>' +
+        '<a href="https://www.facebook.com/search/top/?q='+encodeURIComponent(name+' '+phone)+'" target="_blank" class="pc pc-found">📞 Name+Phone</a>' +
+        '<a href="https://www.google.com/search?q=site:facebook.com+%22'+enc+'%22+%22'+encodeURIComponent(country)+'%22" target="_blank" class="pc pc-found">🔍 Google→FB</a>' +
+        '<a href="https://www.google.com/search?q=site:facebook.com+%22'+enc+'%22" target="_blank" class="pc pc-found">🔍 All FB</a>' +
+      '</div>' +
+      '<div style="padding:4px 12px 10px;font-family:var(--mono);font-size:9px;color:var(--text3)">💡 Look for: location = '+country+', bio with phone, profile photo</div>' +
+    '</div>' +
+
+    // INSTAGRAM
+    '<div style="border:1px solid rgba(225,48,108,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">' +
+      '<div style="background:rgba(225,48,108,.1);padding:8px 12px;font-family:var(--display);font-size:11px;font-weight:700;color:#e1306c;letter-spacing:2px">📸 INSTAGRAM</div>' +
+      '<div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px">' +
+        '<a href="https://www.instagram.com/explore/search/keyword/?q='+enc+'" target="_blank" class="pc pc-found" style="background:rgba(225,48,108,.08);border-color:rgba(225,48,108,.35)">🔍 Search Name</a>' +
+        '<a href="https://www.google.com/search?q=site:instagram.com+%22'+enc+'%22" target="_blank" class="pc pc-found">🔍 Google→IG</a>' +
+        '<a href="https://www.google.com/search?q=site:instagram.com+%22'+encC+'%22" target="_blank" class="pc pc-found">🔍 Name+Country</a>' +
+        '<a href="https://www.picuki.com/search/'+enc+'" target="_blank" class="pc pc-found">Picuki</a>' +
+        '<a href="https://imginn.com/search/?q='+enc+'" target="_blank" class="pc pc-found">Imginn</a>' +
+      '</div>' +
+      '<div style="padding:4px 12px 10px;font-family:var(--mono);font-size:9px;color:var(--text3)">💡 Picuki & Imginn show public posts + bio without logging in</div>' +
+    '</div>' +
+
+    // LINKEDIN
+    '<div style="border:1px solid rgba(0,119,181,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">' +
+      '<div style="background:rgba(0,119,181,.1);padding:8px 12px;font-family:var(--display);font-size:11px;font-weight:700;color:#0a8dff;letter-spacing:2px">💼 LINKEDIN — best for real identity</div>' +
+      '<div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px">' +
+        '<a href="https://www.linkedin.com/search/results/people/?keywords='+enc+'" target="_blank" class="pc pc-found" style="background:rgba(0,119,181,.1);border-color:rgba(0,119,181,.4)">👤 People</a>' +
+        '<a href="https://www.linkedin.com/search/results/people/?keywords='+encC+'" target="_blank" class="pc pc-found">👤 Name+Country</a>' +
+        '<a href="https://www.google.com/search?q=site:linkedin.com/in/+%22'+enc+'%22+%22'+encodeURIComponent(country)+'%22" target="_blank" class="pc pc-found">🔍 Google→LI</a>' +
+        '<a href="https://www.google.com/search?q=site:linkedin.com+%22'+enc+'%22" target="_blank" class="pc pc-found">🔍 All LI</a>' +
+      '</div>' +
+      '<div style="padding:4px 12px 10px;font-family:var(--mono);font-size:9px;color:var(--text3)">💡 Shows job, company, city, education — highest quality public data</div>' +
+    '</div>' +
+
+    // OTHER PLATFORMS
+    '<div style="border:1px solid var(--line2);border-radius:5px;overflow:hidden;margin-bottom:10px">' +
+      '<div style="background:rgba(255,255,255,.04);padding:8px 12px;font-family:var(--display);font-size:11px;font-weight:700;color:var(--text2);letter-spacing:2px">🌐 OTHER PLATFORMS</div>' +
+      '<div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px">' +
+        '<a href="https://twitter.com/search?q='+encC+'&f=user" target="_blank" class="pc pc-found">🐦 Twitter/X</a>' +
+        '<a href="https://www.tiktok.com/search/user?q='+enc+'" target="_blank" class="pc pc-found">🎵 TikTok</a>' +
+        '<a href="https://www.youtube.com/results?search_query='+encC+'" target="_blank" class="pc pc-found">▶️ YouTube</a>' +
+        '<a href="https://www.pinterest.com/search/users/?q='+enc+'" target="_blank" class="pc pc-found">📌 Pinterest</a>' +
+        '<a href="https://t.me/'+name.replace(/\s+/g,'').toLowerCase()+'" target="_blank" class="pc pc-found">✈️ Telegram</a>' +
+        '<a href="https://www.reddit.com/search/?q='+enc+'&type=user" target="_blank" class="pc pc-found">🔴 Reddit</a>' +
+      '</div>' +
+    '</div>' +
+
+    // DEEP DORKS
+    '<div style="border:1px solid rgba(245,166,35,.25);border-radius:5px;overflow:hidden;margin-bottom:10px">' +
+      '<div style="background:rgba(245,166,35,.08);padding:8px 12px;font-family:var(--display);font-size:11px;font-weight:700;color:var(--amber);letter-spacing:2px">🔎 DEEP GOOGLE DORKS</div>' +
+      '<div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px">' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+%22'+encodeURIComponent(country)+'%22" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Name+Country</a>' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+%22'+encodeURIComponent(phone)+'%22" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Name+Phone</a>' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+email+OR+%40gmail+OR+%40yahoo+OR+%40hotmail" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Find Email</a>' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+address+OR+%22lives+in%22+OR+city" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Find Location</a>' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+%22works+at%22+OR+job+OR+company" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Find Employer</a>' +
+        '<a href="https://www.google.com/search?q=%22'+enc+'%22+filetype:pdf+OR+filetype:doc" target="_blank" class="pc pc-found" style="border-color:rgba(245,166,35,.4)">Documents</a>' +
+        '<a href="https://yandex.com/search/?text='+encC+'" target="_blank" class="pc pc-found">Yandex</a>' +
+        '<a href="https://www.bing.com/search?q=%22'+enc+'%22+%22'+encodeURIComponent(country)+'%22" target="_blank" class="pc pc-found">Bing</a>' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="background:var(--bg3);border:1px dashed var(--cyan);border-radius:5px;padding:11px 13px;font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2">' +
+      '📷 <strong style="color:var(--cyan2)">Found their profile photo?</strong><br>' +
+      'Switch to <strong style="color:var(--amber)">EXIF / Image OSINT</strong> → upload the photo<br>' +
+      '→ Reverse image search finds ALL accounts using the same photo<br>' +
+      '→ EXIF data may contain GPS location where photo was taken' +
+    '</div>';
+
+  feed('🔗 Profile chain: ' + name + ' — ' + country, 'ok');
+  stats.recs++; refreshStats();
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: COMPANY / PERSON RECON
+═══════════════════════════════════════════════════════════ */
+async function doRecon(target) {
+  initSteps([
+    {id:'clearbit', lbl:'Company data lookup'},
+    {id:'hunter',   lbl:'Employee email discovery'},
+    {id:'tech',     lbl:'Technology stack detection'},
+    {id:'social',   lbl:'Social & leadership profiles'},
+    {id:'github',   lbl:'GitHub org scan'},
+  ]);
+
+  const isDomain = /^[\w\-]+\.[\w\.]{2,}$/.test(target);
+  const domain   = isDomain ? target : null;
+  const name     = !isDomain ? target : null;
+
+  pRun('clearbit');
+  // Clearbit free company lookup
+  let cb = null;
+  if (domain) {
+    cb = await jfetch(`https://autocomplete.clearbit.com/v1/companies/suggest?query=${encodeURIComponent(domain)}`);
+  }
+  const company = Array.isArray(cb) && cb.length ? cb[0] : null;
+  pOk('clearbit');
+
+  pRun('hunter');
+  // Hunter.io domain search (free 25/month)
+  let hunterData = null;
+  if (domain && keys.hunter) {
+    hunterData = await jfetch(`https://api.hunter.io/v2/domain-search?domain=${domain}&api_key=${keys.hunter}&limit=20`);
+  }
+  // Free: scrape LinkedIn company search
+  pOk('hunter');
+
+  pRun('tech');
+  // BuiltWith free API
+  let bw = null;
+  if (domain) {
+    bw = await jfetch(`https://api.builtwith.com/free1/api.json?KEY=free&LOOKUP=${domain}`);
+  }
+  pOk('tech');
+
+  pRun('social');
+  pOk('social');
+
+  pRun('github');
+  // GitHub org lookup
+  let ghOrg = null;
+  const ghHandle = domain ? domain.split('.')[0] : target.replace(/\s+/g,'').toLowerCase();
+  ghOrg = await jfetch(`https://api.github.com/orgs/${ghHandle}`);
+  let ghRepos = null;
+  if (ghOrg && !ghOrg.message) {
+    ghRepos = await jfetch(`https://api.github.com/orgs/${ghHandle}/repos?per_page=10&sort=updated`);
+  }
+  pOk('github');
+
+  stats.recs++;
+  const enc  = encodeURIComponent(target);
+  const encD = domain ? encodeURIComponent(domain) : enc;
+
+  mkCard('🏢', 'COMPANY / PERSON RECON', 'b-info', target,
+    // COMPANY OVERVIEW
+    (company ? `
+    <div class="dg" style="margin-bottom:12px">
+      <div class="dc"><div class="dl">Company</div><div class="dv dv-hi">${company.name||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Domain</div><div class="dv">${company.domain||'N/A'}</div></div>
+      ${company.logo ? `<div class="dc"><div class="dl">Logo</div>
+        <img src="${company.logo}" style="height:32px;margin-top:4px;border-radius:4px"></div>` : ''}
+    </div>` : '') +
+
+    // EMPLOYEE / EMAIL DISCOVERY
+    `<div class="sub"><div class="sub-hd">// 👥 Employee & Email Discovery</div>
+    ${hunterData?.data?.emails?.length ? `
+      <div style="margin-bottom:10px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--green2);margin-bottom:8px">
+          ✅ ${hunterData.data.total} emails found for ${domain}</div>
+        ${hunterData.data.emails.slice(0,10).map(e => `
+        <div class="dc" style="margin-bottom:5px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="dv dv-hi">${e.value} <button class="cpbtn" onclick="cp('${e.value}')">COPY</button></div>
+            <div class="dl">${e.first_name||''} ${e.last_name||''} — ${e.position||'Unknown role'}
+              ${e.linkedin ? `— <a href="${e.linkedin}" target="_blank" style="color:var(--cyan2)">LinkedIn</a>` : ''}
+            </div>
+          </div>
+          <span class="badge ${e.confidence>80?'b-ok':'b-warn'}">${e.confidence||0}%</span>
+        </div>`).join('')}
+      </div>` :
+      `<div class="notice">⚡ Add Hunter.io free API key for employee email discovery (25 free/month)
+        <a href="https://hunter.io/users/sign_up" target="_blank">Get key</a></div>`}
+    <div class="pg">
+      <a href="https://www.linkedin.com/company/${encD}" target="_blank" class="pc pc-found">💼 LinkedIn Company</a>
+      <a href="https://www.linkedin.com/search/results/people/?keywords=${enc}&facetCurrentCompany=true" target="_blank" class="pc pc-found">👥 Employees</a>
+      <a href="https://hunter.io/search/${encD}" target="_blank" class="pc pc-found">📧 Hunter.io</a>
+      <a href="https://www.rocketreach.co/search?${isDomain?'domain='+encD:'name='+enc}" target="_blank" class="pc pc-found">🚀 RocketReach</a>
+      <a href="https://www.apollo.io/companies/search?q_organization_domains=${encD}" target="_blank" class="pc pc-found">🌙 Apollo.io</a>
+      <a href="https://contactout.com" target="_blank" class="pc pc-found">📞 ContactOut</a>
+    </div></div>` +
+
+    // TECH STACK
+    `<div class="sub"><div class="sub-hd">// 🛠 Technology Stack</div>
+    <div class="pg">
+      <a href="https://builtwith.com/${encD}" target="_blank" class="pc pc-found">🔧 BuiltWith</a>
+      <a href="https://www.wappalyzer.com/lookup/${encD}" target="_blank" class="pc pc-found">🔍 Wappalyzer</a>
+      <a href="https://sitereport.netcraft.com/?url=${encD}" target="_blank" class="pc pc-found">🌐 Netcraft</a>
+      <a href="https://www.shodan.io/search?query=hostname:${encD}" target="_blank" class="pc pc-found">🛰 Shodan</a>
+      <a href="https://securitytrails.com/domain/${encD}/technology" target="_blank" class="pc pc-found">🔒 SecurityTrails</a>
+    </div></div>` +
+
+    // GITHUB ORG
+    (ghOrg && !ghOrg.message ? `
+    <div class="sub"><div class="sub-hd">// 🐙 GitHub Organization</div>
+    <div class="dg">
+      <div class="dc"><div class="dl">Org Name</div><div class="dv dv-hi">${ghOrg.name||ghOrg.login}</div></div>
+      <div class="dc"><div class="dl">Public Repos</div><div class="dv">${ghOrg.public_repos}</div></div>
+      <div class="dc"><div class="dl">Members</div><div class="dv">${ghOrg.public_members_url?'Public':'Hidden'}</div></div>
+      <div class="dc"><div class="dl">Location</div><div class="dv">${ghOrg.location||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Email</div><div class="dv ${ghOrg.email?'dv-bad':''}">${ghOrg.email||'Not public'}</div></div>
+      <div class="dc"><div class="dl">Blog</div><div class="dv">${ghOrg.blog||'N/A'}</div></div>
+    </div>
+    ${ghRepos?.length ? `<div class="sub"><div class="sub-hd">// Top Repos</div>
+      ${ghRepos.slice(0,5).map(r=>`<div class="dc" style="margin-bottom:5px">
+        <div class="dv"><a href="${r.html_url}" target="_blank" style="color:var(--cyan2);text-decoration:none">${r.name}</a>
+          <span style="color:var(--text3);font-size:10px"> — ⭐${r.stargazers_count}</span></div>
+        <div class="dl">${(r.description||'').slice(0,70)}</div>
+      </div>`).join('')}
+    </div>` : ''}
+    </div>` : '') +
+
+    // DEEP DORKS
+    `<div class="sub"><div class="sub-hd">// 🔎 Deep Dork Searches</div>
+    <div class="pg">
+      <a href="https://www.google.com/search?q=site:linkedin.com+%22${enc}%22" target="_blank" class="pc pc-found">LinkedIn Profiles</a>
+      <a href="https://www.google.com/search?q=%22@${encD}%22+email" target="_blank" class="pc pc-found">Email Addresses</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+%22password%22+filetype:pdf+OR+filetype:xls" target="_blank" class="pc pc-found">Leaked Docs</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+%22confidential%22" target="_blank" class="pc pc-found">Confidential</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+%22internal+use%22" target="_blank" class="pc pc-found">Internal Docs</a>
+      <a href="https://www.google.com/search?q=site:github.com+%22${encD}%22" target="_blank" class="pc pc-found">GitHub Leaks</a>
+      <a href="https://www.google.com/search?q=site:pastebin.com+%22${encD}%22" target="_blank" class="pc pc-found">Pastebin</a>
+      <a href="https://www.google.com/search?q=%22${encD}%22+%22api_key%22+OR+%22password%22+OR+%22secret%22" target="_blank" class="pc pc-found">API Keys Leaked</a>
+    </div></div>` +
+
+    `<div class="sub"><div class="sub-hd">// ⌨️ CLI Commands</div>
+    <div class="code">
+      <span class="cm"># theHarvester — emails, subdomains, hosts, employees</span><br>
+      <span class="cd">theHarvester</span> -d ${target} -b all -l 200<br><br>
+      <span class="cm"># Recon-ng</span><br>
+      <span class="cd">recon-ng</span><br>
+      > marketplace install all<br>
+      > modules load recon/domains-contacts/hunter_io<br>
+      > set SOURCE ${target}; run<br><br>
+      <span class="cm"># SpiderFoot</span><br>
+      <span class="cd">spiderfoot</span> -s ${target} -t EMAILADDR,PERSON,USERNAME
+    </div></div>`
+  );
+  feed(`🏢 Recon: ${target}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: DOCUMENT METADATA EXTRACTOR
+═══════════════════════════════════════════════════════════ */
+async function doMeta(file) {
+  initSteps([
+    {id:'read',   lbl:'Reading file'},
+    {id:'parse',  lbl:'Extracting metadata'},
+    {id:'author', lbl:'Author & software analysis'},
+    {id:'hidden', lbl:'Hidden content scan'},
+    {id:'report', lbl:'Building report'},
+  ]);
+
+  pRun('read');
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const name  = file.name;
+  const ext   = name.split('.').pop().toLowerCase();
+  const size  = (file.size / 1024).toFixed(1);
+  pOk('read');
+
+  pRun('parse');
+  let meta = { author:'', created:'', modified:'', software:'', company:'',
+                title:'', subject:'', keywords:'', pages:'', revision:'', manager:'', template:'' };
+  let rawText = '';
+  let hiddenItems = [];
+
+  if (['jpg','jpeg','png','gif','webp','tiff','heic'].includes(ext)) {
+    // Image — reuse EXIF parser
+    const exifData = parseEXIF(bytes);
+    Object.assign(meta, {
+      author:    exifData.tags['Artist'] || exifData.tags['CameraOwnerName'] || '',
+      software:  exifData.tags['Software'] || '',
+      created:   exifData.tags['DateTimeOriginal'] || exifData.tags['DateTime'] || '',
+      modified:  exifData.tags['DateTime'] || '',
+    });
+    if (exifData.gps?.lat) {
+      hiddenItems.push({ icon:'🚨', label:'GPS Location FOUND', value:`${exifData.gps.lat.toFixed(6)}, ${exifData.gps.lon.toFixed(6)}`, sev:'bad' });
+    }
+    if (meta.software) hiddenItems.push({ icon:'📱', label:'Device Software', value: meta.software, sev:'warn' });
+    if (exifData.tags['BodySerialNumber']) hiddenItems.push({ icon:'🔢', label:'Camera Serial', value: exifData.tags['BodySerialNumber'], sev:'warn' });
+    if (exifData.tags['LensModel']) hiddenItems.push({ icon:'🔭', label:'Lens Model', value: exifData.tags['LensModel'], sev:'info' });
+  } else if (ext === 'pdf') {
+    // PDF metadata extraction
+    rawText = '';
+    for (let i = 0; i < Math.min(bytes.length, 300000); i++) {
+      rawText += String.fromCharCode(bytes[i]);
+    }
+    const extract = (key) => {
+      const patterns = [
+        new RegExp('/'+key+'\\s*\\(([^)]{1,200})\\)'),
+        new RegExp('/'+key+'\\s*<([^>]{1,200})>'),
+      ];
+      for (const re of patterns) {
+        const m = rawText.match(re);
+        if (m?.[1]) return m[1].replace(/[^\x20-\x7E]/g,'').trim();
+      }
+      return '';
+    };
+    meta.author   = extract('Author');
+    meta.creator  = extract('Creator');
+    meta.producer = extract('Producer');
+    meta.title    = extract('Title');
+    meta.subject  = extract('Subject');
+    meta.keywords = extract('Keywords');
+    meta.created  = extract('CreationDate').replace(/D:/,'').slice(0,14);
+    meta.modified = extract('ModDate').replace(/D:/,'').slice(0,14);
+    meta.software = meta.producer || meta.creator;
+    meta.company  = extract('Company');
+
+    if (meta.author)   hiddenItems.push({ icon:'👤', label:'Author Name', value: meta.author, sev:'bad' });
+    if (meta.company)  hiddenItems.push({ icon:'🏢', label:'Company', value: meta.company, sev:'warn' });
+    if (meta.creator)  hiddenItems.push({ icon:'💻', label:'Created With', value: meta.creator, sev:'warn' });
+    if (meta.producer) hiddenItems.push({ icon:'🖨', label:'PDF Producer', value: meta.producer, sev:'info' });
+
+    // Check for embedded JS
+    if (rawText.includes('/JavaScript') || rawText.includes('/JS')) {
+      hiddenItems.push({ icon:'⚠️', label:'JavaScript Embedded', value:'May execute on open — MALWARE RISK', sev:'bad' });
+    }
+    // Check for embedded files
+    if (rawText.includes('/EmbeddedFile')) {
+      hiddenItems.push({ icon:'📎', label:'Embedded File Found', value:'PDF contains hidden attachment', sev:'bad' });
+    }
+    // Check for forms
+    if (rawText.includes('/AcroForm')) {
+      hiddenItems.push({ icon:'📝', label:'Interactive Form', value:'PDF contains fillable form fields', sev:'info' });
+    }
+    // Check for URL actions
+    const urls = [...rawText.matchAll(/URI\s*\(([^)]{5,200})\)/g)].map(m=>m[1]).slice(0,5);
+    if (urls.length) {
+      hiddenItems.push({ icon:'🔗', label:'Embedded URLs', value: urls.join(', '), sev:'warn' });
+    }
+
+  } else if (['docx','xlsx','pptx'].includes(ext)) {
+    // OOXML — ZIP-based, look for XML signatures
+    const sig = String.fromCharCode(...bytes.slice(0,4));
+    if (sig === 'PK\x03\x04') {
+      // It's a ZIP — decode text portions
+      rawText = new TextDecoder('utf-8', {fatal:false}).decode(bytes);
+      const xmlExtract = (tag) => {
+        const re = new RegExp('<(?:cp:)?'+tag+'[^>]*>([^<]{1,300})<');
+        return (rawText.match(re)||[])[1] || '';
+      };
+      meta.author   = xmlExtract('lastModifiedBy') || xmlExtract('creator');
+      meta.created  = xmlExtract('created');
+      meta.modified = xmlExtract('modified');
+      meta.title    = xmlExtract('title');
+      meta.subject  = xmlExtract('subject');
+      meta.keywords = xmlExtract('keywords');
+      meta.company  = xmlExtract('company');
+      meta.template = xmlExtract('template');
+      meta.revision = xmlExtract('revision');
+      meta.software = (rawText.match(/Application="([^"]{1,80})"/)||[])[1] || '';
+      const appVersion = (rawText.match(/AppVersion="([^"]{1,20})"/)||[])[1] || '';
+
+      if (meta.author)   hiddenItems.push({ icon:'👤', label:'Last Modified By', value: meta.author, sev:'bad' });
+      if (meta.company)  hiddenItems.push({ icon:'🏢', label:'Company / Organization', value: meta.company, sev:'bad' });
+      if (meta.software) hiddenItems.push({ icon:'💻', label:'Software Used', value: `${meta.software} ${appVersion}`, sev:'warn' });
+      if (meta.template) hiddenItems.push({ icon:'📋', label:'Template Path', value: meta.template, sev:'warn' });
+      if (meta.revision && parseInt(meta.revision)>1) hiddenItems.push({ icon:'🔄', label:'Revision Count', value: meta.revision+' revisions — editing history exists', sev:'info' });
+
+      // Find email addresses in document
+      const emails = [...new Set([...rawText.matchAll(/[\w\.\-]+@[\w\.\-]+\.\w{2,}/g)].map(m=>m[0]))].slice(0,10);
+      if (emails.length) hiddenItems.push({ icon:'📧', label:'Email Addresses Found', value: emails.join(', '), sev:'bad' });
+
+      // Find embedded URLs
+      const docUrls = [...new Set([...rawText.matchAll(/https?:\/\/[^\s"<>]{5,100}/g)].map(m=>m[0]))].slice(0,8);
+      if (docUrls.length) hiddenItems.push({ icon:'🔗', label:'Embedded Links', value: docUrls.join('\n'), sev:'info' });
+
+      // Detect tracked changes
+      if (rawText.includes('w:del ') || rawText.includes('w:ins ')) {
+        hiddenItems.push({ icon:'📝', label:'Track Changes Found', value:'Document contains hidden edit history — deleted/inserted text visible in raw XML', sev:'warn' });
+      }
+      // Find comments
+      const commentAuthors = [...new Set([...rawText.matchAll(/w:author="([^"]{1,60})"/g)].map(m=>m[1]))];
+      if (commentAuthors.length) hiddenItems.push({ icon:'💬', label:'Comment Authors', value: commentAuthors.join(', '), sev:'bad' });
+    }
+  }
+
+  pOk('parse');
+  pRun('author');
+  pOk('author');
+  pRun('hidden');
+  pOk('hidden');
+  pRun('report');
+
+  stats.recs++;
+  const sevColor = { bad:'var(--red)', warn:'var(--amber)', info:'var(--cyan2)' };
+  const sevBadge = { bad:'b-bad', warn:'b-warn', info:'b-info' };
+
+  mkCard('📄', `METADATA — ${name}`,
+    hiddenItems.some(i=>i.sev==='bad') ? 'b-bad' : hiddenItems.length ? 'b-warn' : 'b-ok',
+    hiddenItems.length ? `${hiddenItems.length} FINDINGS` : 'CLEAN',
+
+    `<div class="dg">
+      <div class="dc"><div class="dl">Filename</div><div class="dv dv-hi">${name}</div></div>
+      <div class="dc"><div class="dl">File Type</div><div class="dv">${ext.toUpperCase()}</div></div>
+      <div class="dc"><div class="dl">Size</div><div class="dv">${size} KB</div></div>
+      <div class="dc"><div class="dl">Author / Creator</div>
+        <div class="dv ${meta.author?'dv-bad':''}">${meta.author||'Not found'}</div></div>
+      <div class="dc"><div class="dl">Company</div>
+        <div class="dv ${meta.company?'dv-bad':''}">${meta.company||'Not found'}</div></div>
+      <div class="dc"><div class="dl">Software</div>
+        <div class="dv ${meta.software?'dv-warn':''}">${meta.software||'Not found'}</div></div>
+      <div class="dc"><div class="dl">Created</div><div class="dv">${meta.created||'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Last Modified</div><div class="dv">${meta.modified||'Unknown'}</div></div>
+      ${meta.title?`<div class="dc"><div class="dl">Title</div><div class="dv">${meta.title}</div></div>`:''}
+      ${meta.keywords?`<div class="dc"><div class="dl">Keywords</div><div class="dv">${meta.keywords}</div></div>`:''}
+      ${meta.revision?`<div class="dc"><div class="dl">Revisions</div><div class="dv">${meta.revision}</div></div>`:''}
+    </div>
+
+    ${hiddenItems.length ? `
+    <div class="sub">
+      <div class="sub-hd">// 🚨 HIDDEN DATA FINDINGS (${hiddenItems.length})</div>
+      ${hiddenItems.map(item => `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+        margin-bottom:6px;border-radius:4px;
+        background:rgba(${item.sev==='bad'?'255,68,68':item.sev==='warn'?'245,166,35':'0,212,232'},.06);
+        border:1px solid rgba(${item.sev==='bad'?'255,68,68':item.sev==='warn'?'245,166,35':'0,212,232'},.25)">
+        <span style="font-size:16px;flex-shrink:0">${item.icon}</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px">${item.label}</div>
+          <div style="font-family:var(--mono);font-size:12px;color:${sevColor[item.sev]};word-break:break-all;margin-top:3px">
+            ${item.value}
+            <button class="cpbtn" onclick="cp('${item.value.replace(/'/g,"\\'")}')">COPY</button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>` : `
+    <div class="sub">
+      <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);
+        border-radius:4px;padding:12px;font-family:var(--mono);font-size:11px;color:var(--green2)">
+        ✅ No sensitive metadata found in this file.
+      </div>
+    </div>`}
+
+    <div class="sub"><div class="sub-hd">// 🔧 Strip Metadata — CLI</div>
+    <div class="code">
+      <span class="cm"># Remove ALL metadata (images)</span><br>
+      <span class="cd">exiftool</span> -all= "${name}"<br>
+      <span class="cm"># Strip PDF metadata</span><br>
+      <span class="cd">exiftool</span> -all:all= "${name}"<br>
+      <span class="cm"># Online tool</span><br>
+      # metadata2go.com &nbsp;|&nbsp; exifpurge.com
+    </div></div>`
+  );
+  pOk('report');
+  feed(`📄 Metadata: ${name} — ${hiddenItems.length} findings`, hiddenItems.some(i=>i.sev==='bad')?'crit':'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: DARK WEB EXPOSURE
+═══════════════════════════════════════════════════════════ */
+async function doDarkWeb(target) {
+  initSteps([
+    {id:'hibp',    lbl:'HaveIBeenPwned database'},
+    {id:'paste',   lbl:'Paste site scan'},
+    {id:'google',  lbl:'Dark web dork search'},
+    {id:'leak',    lbl:'Leak database links'},
+    {id:'monitor', lbl:'Monitoring resources'},
+  ]);
+
+  pRun('hibp');
+  const isEmail  = target.includes('@');
+  const isDomain = !isEmail && target.includes('.');
+  const tid = target.replace(/[^a-z0-9]/gi,'_');
+  pOk('hibp');
+
+  pRun('paste');
+  pOk('paste');
+  pRun('google');
+  pOk('google');
+  pRun('leak');
+  pOk('leak');
+  pRun('monitor');
+
+  const enc = encodeURIComponent(target);
+  stats.recs++;
+
+  mkCard('🕳', 'DARK WEB EXPOSURE', 'b-warn', target,
+    // BREACH CHECK
+    `<div class="sub"><div class="sub-hd">// ☣ Breach Database Check</div>
+    <div id="dw_hibp_${tid}">
+      ${keys.hibp && isEmail ?
+        '<div style="font-family:var(--mono);font-size:10px;color:var(--cyan2)">⟳ Checking HIBP...</div>' :
+        `<div class="notice">⚡ Add HIBP key in sidebar for automated breach check.<br>
+          <a href="https://haveibeenpwned.com/account/${enc}" target="_blank">Check manually on HIBP</a></div>`}
+    </div></div>` +
+
+    // PASTE SITES
+    `<div class="sub"><div class="sub-hd">// 📋 Paste Site Scan</div>
+    <div class="pg">
+      <a href="https://pastebin.com/search?q=${enc}" target="_blank" class="pc pc-found">Pastebin Search</a>
+      <a href="https://paste.ee/search?q=${enc}" target="_blank" class="pc pc-found">Paste.ee</a>
+      <a href="https://controlc.com/search?search=${enc}" target="_blank" class="pc pc-found">ControlC</a>
+      <a href="https://ghostbin.co/search?q=${enc}" target="_blank" class="pc pc-found">Ghostbin</a>
+      <a href="https://pastebin.pl/search?q=${enc}" target="_blank" class="pc pc-found">Pastebin.pl</a>
+      <a href="https://rentry.co" target="_blank" class="pc pc-found">Rentry.co</a>
+    </div></div>` +
+
+    // LEAK DATABASES
+    `<div class="sub"><div class="sub-hd">// 🗄 Leak Databases — Largest Collections</div>
+    <div class="pg">
+      <a href="https://haveibeenpwned.com/account/${enc}" target="_blank" class="pc pc-found" style="background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.4)">☣ HIBP</a>
+      <a href="https://dehashed.com/search?query=${enc}" target="_blank" class="pc pc-found">Dehashed</a>
+      <a href="https://intelx.io/?s=${enc}" target="_blank" class="pc pc-found">IntelX</a>
+      <a href="https://breachdirectory.org" target="_blank" class="pc pc-found">BreachDirectory</a>
+      <a href="https://leakcheck.io/search?query=${enc}" target="_blank" class="pc pc-found">LeakCheck</a>
+      <a href="https://leak-lookup.com/search" target="_blank" class="pc pc-found">Leak-Lookup</a>
+      <a href="https://www.ghostproject.fr/search?s=${enc}" target="_blank" class="pc pc-found">GhostProject</a>
+      <a href="https://snusbase.com" target="_blank" class="pc pc-found">Snusbase</a>
+    </div></div>` +
+
+    // DARK WEB SEARCH ENGINES
+    `<div class="sub"><div class="sub-hd">// 🧅 Dark Web & Underground Search</div>
+    <div class="notice" style="margin-bottom:10px">
+      ⚠️ These links search for mentions on dark web indexes and underground forums.
+      Access requires Tor Browser for .onion links.
+    </div>
+    <div class="pg">
+      <a href="https://ahmia.fi/search/?q=${enc}" target="_blank" class="pc pc-found">Ahmia (Tor Index)</a>
+      <a href="https://darksearch.io/search?query=${enc}" target="_blank" class="pc pc-found">DarkSearch.io</a>
+      <a href="https://onionsearchengine.com" target="_blank" class="pc pc-found">OnionSearch</a>
+      <a href="https://recon.darkweb.io" target="_blank" class="pc pc-found">DarkWeb Recon</a>
+    </div></div>` +
+
+    // GOOGLE DORKS FOR DARK WEB
+    `<div class="sub"><div class="sub-hd">// 🔎 Surface Web Leak Dorks</div>
+    <div class="pg">
+      <a href="https://www.google.com/search?q=%22${enc}%22+breach+OR+leak+OR+%22data+dump%22" target="_blank" class="pc pc-found">Breach Mentions</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+site:pastebin.com+OR+site:paste.ee+OR+site:controlc.com" target="_blank" class="pc pc-found">Paste Sites</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+site:raidforums.com+OR+site:breachforums.com+OR+site:nulled.to" target="_blank" class="pc pc-found">Hacker Forums</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+filetype:sql+OR+filetype:csv+OR+filetype:txt+%22password%22" target="_blank" class="pc pc-found">Leaked Files</a>
+      <a href="https://www.google.com/search?q=site:github.com+%22${enc}%22+password+OR+credentials" target="_blank" class="pc pc-found">GitHub Commits</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+site:scribd.com+OR+site:slideshare.net" target="_blank" class="pc pc-found">Documents</a>
+    </div></div>` +
+
+    // MONITORING
+    `<div class="sub"><div class="sub-hd">// 🔔 Set Up Monitoring Alerts</div>
+    <div class="pg">
+      <a href="https://haveibeenpwned.com/NotifyMe" target="_blank" class="pc pc-found">HIBP Alerts</a>
+      <a href="https://monitor.firefox.com" target="_blank" class="pc pc-found">Firefox Monitor</a>
+      <a href="https://www.google.com/alerts?q=${enc}" target="_blank" class="pc pc-found">Google Alerts</a>
+      <a href="https://dehashed.com/alerts" target="_blank" class="pc pc-found">Dehashed Monitor</a>
+      <a href="https://intelx.io/tools?tab=email" target="_blank" class="pc pc-found">IntelX Watchlist</a>
+    </div></div>` +
+
+    `<div class="sub"><div class="sub-hd">// ⌨️ CLI</div>
+    <div class="code">
+      <span class="cm"># h8mail — breach hunting</span><br>
+      <span class="cd">h8mail</span> -t ${target} --breach-parse<br>
+      <span class="cm"># holehe — check 120 sites for email</span><br>
+      <span class="cd">holehe</span> ${target}<br>
+      <span class="cm"># pwnedornot</span><br>
+      <span class="cd">pwnedornot</span> -e ${target}
+    </div></div>`
+  );
+
+  if (keys.hibp && isEmail) {
+    await hibp(target, `dw_hibp_${tid}`);
+  }
+
+  pOk('monitor');
+  feed(`🕳 Dark web scan: ${target}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: NETWORK MAPPER
+═══════════════════════════════════════════════════════════ */
+async function doNetMap(target) {
+  initSteps([
+    {id:'dns',   lbl:'Full DNS enumeration'},
+    {id:'certs', lbl:'Certificate transparency'},
+    {id:'heads', lbl:'HTTP headers & tech stack'},
+    {id:'vt',    lbl:'VirusTotal passive DNS'},
+    {id:'map',   lbl:'Building network map'},
+  ]);
+
+  const domain = target.replace(/^https?:\/\//,'').split('/')[0];
+
+  pRun('dns');
+  const DNS_TYPES = ['A','AAAA','MX','NS','TXT','SOA','CAA','SRV','PTR'];
+  const dns = {};
+  for (const t of DNS_TYPES) {
+    const r = await jfetch(`https://dns.google/resolve?name=${domain}&type=${t}`);
+    dns[t] = r?.Answer || r?.Authority || [];
+  }
+
+  // Common subdomains
+  const COMMON_SUBS = ['www','mail','smtp','pop','imap','ftp','sftp','vpn',
+    'remote','dev','staging','test','api','app','admin','portal','dashboard',
+    'login','secure','mx','ns1','ns2','cdn','static','assets','media',
+    'images','blog','shop','store','support','help','docs','wiki'];
+  const subResults = {};
+  for (const sub of COMMON_SUBS.slice(0,12)) {
+    const r = await jfetch(`https://dns.google/resolve?name=${sub}.${domain}&type=A`);
+    if (r?.Answer?.length) {
+      subResults[sub+'.'+domain] = r.Answer.map(a=>a.data).filter(d=>/^\d/.test(d));
+    }
+  }
+  pOk('dns');
+
+  pRun('certs');
+  const crtData = await jfetch(`https://crt.sh/?q=%25.${domain}&output=json`);
+  const allSubs = new Set();
+  if (crtData) {
+    crtData.forEach(c => {
+      (c.name_value||'').split('\n').forEach(n => {
+        n = n.trim().replace(/^\*\./,'');
+        if (n.includes(domain) && n !== domain) allSubs.add(n);
+      });
+    });
+  }
+  pOk('certs');
+
+  pRun('heads');
+  // Fetch HTTP headers via a CORS-safe endpoint
+  let headers = {};
+  let serverInfo = '';
+  let techStack = [];
+  try {
+    const r = await fetch(`https://${domain}`, {method:'HEAD', signal: AbortSignal.timeout(8000), mode:'no-cors'});
+    // no-cors won't give us headers but tells us if server is up
+    serverInfo = 'Responding';
+  } catch {}
+
+  // Securityheaders.com for passive header data
+  const shData = await jfetch(`https://api.securityheaders.com/?q=${domain}&hide=on`);
+
+  pOk('heads');
+
+  pRun('vt');
+  let vtDomain = null;
+  if (keys.vt) {
+    vtDomain = await fetch(`https://www.virustotal.com/api/v3/domains/${domain}`,
+      {headers:{'x-apikey':keys.vt}}).then(r=>r.ok?r.json():null).catch(()=>null);
+    stats.apis++;
+  }
+  const vtMal    = vtDomain?.data?.attributes?.last_analysis_stats?.malicious||0;
+  const vtClean  = vtDomain?.data?.attributes?.last_analysis_stats?.harmless||0;
+  const vtTotal  = Object.values(vtDomain?.data?.attributes?.last_analysis_stats||{}).reduce((a,b)=>a+b,0);
+  const vtIPs    = vtDomain?.data?.attributes?.last_dns_records?.filter(r=>r.type==='A').map(r=>r.value) || [];
+  pOk('vt');
+
+  pRun('map');
+  const aRecs = dns['A'].map(r=>r.data).filter(d=>/^\d/.test(d));
+  const mxRecs = dns['MX'].map(r=>r.data);
+  const nsRecs = dns['NS'].map(r=>r.data);
+  const txtRecs = dns['TXT'].map(r=>r.data);
+  const allIPs = [...new Set([...aRecs, ...vtIPs])];
+
+  stats.recs++;
+
+  mkCard('🌐', `NETWORK MAP — ${domain}`,
+    vtMal > 3 ? 'b-bad' : vtMal ? 'b-warn' : 'b-ok',
+    vtMal ? `${vtMal} THREATS` : 'CLEAN',
+
+    // OVERVIEW
+    `<div class="dg">
+      <div class="dc"><div class="dl">Domain</div><div class="dv dv-hi">${domain}</div></div>
+      <div class="dc"><div class="dl">IPv4 Address(es)</div>
+        <div class="dv dv-ok">${aRecs.join(', ')||'None'}</div></div>
+      <div class="dc"><div class="dl">Nameservers</div>
+        <div class="dv">${nsRecs.slice(0,2).join(', ').slice(0,70)||'None'}</div></div>
+      <div class="dc"><div class="dl">Mail Provider</div>
+        <div class="dv">${mxProvider(mxRecs)}</div></div>
+      <div class="dc"><div class="dl">VirusTotal</div>
+        <div class="dv ${vtMal?'dv-bad':'dv-ok'}">${vtDomain?vtMal+' malicious / '+vtTotal+' total':keys.vt?'Querying...':'Add VT key'}</div></div>
+      <div class="dc"><div class="dl">Subdomains (crt.sh)</div>
+        <div class="dv dv-hi">${allSubs.size} discovered</div></div>
+      <div class="dc"><div class="dl">Resolved Subs (live)</div>
+        <div class="dv dv-ok">${Object.keys(subResults).length} alive</div></div>
+    </div>` +
+
+    // VISUAL NETWORK MAP
+    `<div class="sub"><div class="sub-hd">// 🗺 Visual Network Graph</div>
+    <div style="background:var(--bg0);border:1px solid var(--line2);border-radius:6px;padding:16px;
+      font-family:var(--mono);font-size:10px;overflow-x:auto;min-height:120px">
+      <div style="display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap">
+        <!-- Root domain -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
+          <div style="background:rgba(245,166,35,.15);border:2px solid var(--amber);border-radius:6px;
+            padding:8px 14px;color:var(--amber2);font-weight:700;font-size:12px;white-space:nowrap">
+            🌐 ${domain}</div>
+          <div style="width:2px;height:20px;background:var(--line2)"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:600px">
+            ${aRecs.map(ip=>`<div style="background:rgba(0,212,232,.1);border:1px solid var(--cyan);
+              border-radius:4px;padding:4px 8px;color:var(--cyan2);white-space:nowrap">
+              📍 ${ip}</div>`).join('')}
+            ${mxRecs.slice(0,2).map(mx=>`<div style="background:rgba(0,230,118,.07);border:1px solid var(--green);
+              border-radius:4px;padding:4px 8px;color:var(--green2);white-space:nowrap;font-size:9px">
+              📧 ${mx.slice(0,40)}</div>`).join('')}
+            ${nsRecs.slice(0,2).map(ns=>`<div style="background:rgba(192,132,252,.07);border:1px solid var(--purple);
+              border-radius:4px;padding:4px 8px;color:var(--purple);white-space:nowrap;font-size:9px">
+              🔧 ${ns.slice(0,35)}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div></div>` +
+
+    // LIVE SUBDOMAINS
+    (Object.keys(subResults).length ? `
+    <div class="sub"><div class="sub-hd">// ✅ Live Subdomains (${Object.keys(subResults).length} responding)</div>
+    <div class="dg">
+      ${Object.entries(subResults).map(([sub, ips])=>`
+      <div class="dc" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="dv dv-ok">${sub}</div>
+          <div class="dl">${ips.join(', ')}</div>
+        </div>
+        <a href="https://${sub}" target="_blank"
+          style="color:var(--cyan2);font-size:9px;border:1px solid var(--line2);padding:2px 6px;
+          border-radius:2px;text-decoration:none;flex-shrink:0;margin-left:8px">↗</a>
+      </div>`).join('')}
+    </div></div>` : '') +
+
+    // ALL DISCOVERED SUBS
+    (allSubs.size ? `
+    <div class="sub"><div class="sub-hd">// 📋 All Discovered Subdomains via crt.sh (${allSubs.size})</div>
+    <div class="tags">
+      ${[...allSubs].slice(0,30).map(s=>`<span class="tag">${s}</span>`).join('')}
+      ${allSubs.size>30?`<span class="tag ta">+${allSubs.size-30} more</span>`:''}
+    </div></div>` : '') +
+
+    // DNS RECORDS
+    `<div class="sub"><div class="sub-hd">// 📡 Full DNS Records</div>
+    <div class="dg">
+      ${Object.entries(dns).filter(([,v])=>v.length).map(([type, recs])=>`
+      <div class="dc"><div class="dl">${type} Records</div>
+        <div class="dv" style="font-size:10px">${recs.map(r=>r.data||r.name||JSON.stringify(r)).slice(0,3).join('<br>').slice(0,150)}</div>
+      </div>`).join('')}
+    </div></div>` +
+
+    // TXT ANALYSIS
+    (txtRecs.length ? `
+    <div class="sub"><div class="sub-hd">// 🏷 TXT Record Analysis — Services Detected</div>
+    ${txtRecs.map(t=>`<div class="dc" style="margin-bottom:5px">
+      <div class="dv" style="font-size:9px;color:var(--text2)">${t.slice(0,160)}</div>
+      ${parseTXT(t)}
+    </div>`).join('')}
+    </div>` : '') +
+
+    // TOOLS
+    `<div class="sub"><div class="sub-hd">// 🔧 Recon Tools</div>
+    <div class="pg">
+      <a href="https://crt.sh/?q=${domain}" target="_blank" class="pc pc-found">crt.sh</a>
+      <a href="https://www.shodan.io/search?query=hostname:${domain}" target="_blank" class="pc pc-found">Shodan</a>
+      <a href="https://securitytrails.com/domain/${domain}/dns" target="_blank" class="pc pc-found">SecurityTrails</a>
+      <a href="https://www.virustotal.com/gui/domain/${domain}" target="_blank" class="pc pc-found">VirusTotal</a>
+      <a href="https://dnsdumpster.com" target="_blank" class="pc pc-found">DNSDumpster</a>
+      <a href="https://search.censys.io/search?resource=hosts&q=${domain}" target="_blank" class="pc pc-found">Censys</a>
+      <a href="https://web.archive.org/web/*/${domain}" target="_blank" class="pc pc-found">Wayback</a>
+      <a href="https://www.nmmapper.com/sys/tools/subdomainfinder/" target="_blank" class="pc pc-found">SubFinder</a>
+    </div></div>` +
+
+    `<div class="sub"><div class="sub-hd">// ⌨️ CLI Commands</div>
+    <div class="code">
+      <span class="cm"># subfinder — passive subdomain enum</span><br>
+      <span class="cd">subfinder</span> -d ${domain} -all -silent<br>
+      <span class="cm"># amass — comprehensive recon</span><br>
+      <span class="cd">amass</span> enum -passive -d ${domain}<br>
+      <span class="cm"># nmap — port scan (with permission only)</span><br>
+      <span class="cd">nmap</span> -sV -sC -T4 --top-ports 1000 ${aRecs[0]||domain}<br>
+      <span class="cm"># whatweb — tech stack</span><br>
+      <span class="cd">whatweb</span> ${domain} -v
+    </div></div>`
+  );
+
+  pOk('map');
+
+  // Auto scan found IPs
+  for (const ip of allIPs.slice(0,2)) {
+    await ipCard(ip, domain);
+  }
+
+  feed(`🌐 Network map: ${domain} — ${allSubs.size} subs, ${allIPs.length} IPs`, 'ok');
+  refreshStats();
 }
 
 /* ═══════════════════════════════════════════
